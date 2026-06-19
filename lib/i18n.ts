@@ -1,0 +1,46 @@
+import type { Lang } from './types'
+
+export const UI: Record<string, Record<Lang, string>> = {
+  appTitle: { en: 'Comparative Health Systems', he: 'מערכות בריאות בעולם' },
+  login: { en: 'Log In', he: 'התחברות' },
+  register: { en: 'Register', he: 'הרשמה' },
+  username: { en: 'Username', he: 'שם משתמש' },
+  password: { en: 'Password', he: 'סיסמה' },
+  logout: { en: 'Log Out', he: 'התנתקות' },
+  selectCountries: { en: 'Select countries to compare', he: 'בחרו מדינות להשוואה' },
+  selectAtLeast: { en: 'Please select at least one country.', he: 'יש לבחור לפחות מדינה אחת.' },
+  startQuiz: { en: 'Start', he: 'התחלה' },
+  category: { en: 'Category', he: 'קטגוריה' },
+  of: { en: 'of', he: 'מתוך' },
+  yourAnswer: { en: 'Your answer', he: 'תשובתך' },
+  hint: { en: 'Hint', he: 'רמז' },
+  getFeedback: { en: 'Get AI Feedback', he: 'קבל משוב AI' },
+  skip: { en: 'Skip', he: 'דלג' },
+  next: { en: 'Next', he: 'הבא' },
+  prev: { en: 'Previous', he: 'הקודם' },
+  save: { en: 'Saved ✓', he: 'נשמר ✓' },
+  export: { en: 'Export', he: 'ייצוא' },
+  exportExcel: { en: 'Export to Excel', he: 'ייצוא ל-Excel' },
+  exportWord: { en: 'Export to Word', he: 'ייצוא ל-Word' },
+  adminPanel: { en: 'Admin Panel', he: 'פאנל ניהול' },
+  students: { en: 'Students', he: 'סטודנטים' },
+  completion: { en: 'Completion', he: 'השלמה' },
+  viewAnswers: { en: 'View Answers', he: 'צפה בתשובות' },
+  deleteUser: { en: 'Delete', he: 'מחק' },
+  feedbackLoading: { en: 'Analyzing your answer…', he: 'מנתח את תשובתך…' },
+  hintTitle: { en: 'Hint', he: 'רמז' },
+  feedbackTitle: { en: 'AI Feedback', he: 'משוב AI' },
+  close: { en: 'Close', he: 'סגור' },
+  noAnswer: { en: 'No answer provided yet.', he: 'טרם ניתנה תשובה.' },
+  progress: { en: 'Progress', he: 'התקדמות' },
+  alreadyHaveAccount: { en: 'Already have an account?', he: 'כבר יש לך חשבון?' },
+  noAccount: { en: "Don't have an account?", he: 'אין לך חשבון?' },
+  errorLogin: { en: 'Invalid username or password.', he: 'שם משתמש או סיסמה שגויים.' },
+  errorRegister: { en: 'Registration failed. Username may already be taken.', he: 'ההרשמה נכשלה. ייתכן ששם המשתמש כבר תפוס.' },
+  changeCountries: { en: 'Change countries', he: 'שנה מדינות' },
+  confirmDelete: { en: 'Delete this user?', he: 'למחוק משתמש זה?' },
+}
+
+export function t(key: string, lang: Lang): string {
+  return UI[key]?.[lang] ?? key
+}
