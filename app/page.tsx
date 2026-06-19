@@ -29,7 +29,7 @@ export default function AuthPage() {
         password,
       })
       if (signUpErr || !data.user) {
-        setError(signUpErr?.message || 'No user returned')
+        setError(JSON.stringify(signUpErr) + ' | user: ' + JSON.stringify(data?.user?.id))
         setLoading(false)
         return
       }
