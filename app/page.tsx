@@ -13,6 +13,7 @@ export default function AuthPage() {
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+  const [showPassword, setShowPassword] = useState(false)
 
   const email = (u: string) => `${u.toLowerCase().trim()}@hsc-course.com`
 
@@ -29,7 +30,7 @@ export default function AuthPage() {
         password,
       })
       if (signUpErr || !data.user) {
-        setError(JSON.stringify(signUpErr) + ' | user: ' + JSON.stringify(data?.user?.id))
+        setError(signUpErr?.message || t('errorLogin', lang))
         setLoading(false)
         return
       }
@@ -104,9 +105,15 @@ export default function AuthPage() {
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">{t('password', lang)}</label>
-            <input type="password" value={password} onChange={e => setPassword(e.target.value)}
-              className="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              autoComplete={mode === 'register' ? 'new-password' : 'current-password'} required />
+            <div className="relative">
+              <input type={showPassword ? 'text' : 'password'} value={password} onChange={e => setPassword(e.target.value)}
+                className="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 pr-10"
+                autoComplete={mode === 'register' ? 'new-password' : 'current-password'} required />
+              <button type="button" onClick={() => setShowPassword(v => !v)}
+                className="absolute inset-y-0 right-2 flex items-center text-gray-400 hover:text-gray-600 text-lg">
+                {showPassword ? '🙈' : '👁️'}
+              </button>
+            </div>
           </div>
           {error && <p className="text-red-600 text-sm">{error}</p>}
           <button type="submit" disabled={loading}
