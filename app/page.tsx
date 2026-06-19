@@ -15,7 +15,7 @@ export default function AuthPage() {
   const [loading, setLoading] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
 
-  const email = (u: string) => `${u.toLowerCase().trim()}@example.com`
+  const fakeEmail = (u: string) => `${u.toLowerCase().trim()}@example.com`
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -25,26 +25,23 @@ export default function AuthPage() {
     if (!trimmed || !password) { setLoading(false); return }
 
     if (mode === 'register') {
-      const { data, error: signUpErr } = await supabase.auth.signUp({
-        email: email(trimmed),
-        password,
+      const res = await fetch('/api/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username: trimmed, password }),
       })
-      if (signUpErr || !data.user) {
-        setError(signUpErr?.message || t('errorLogin', lang))
+      const json = await res.json()
+      if (!res.ok || !json.session) {
+        setError(json.error || t('errorLogin', lang))
         setLoading(false)
         return
       }
-      // upsert profile
-      await supabase.from('profiles').upsert({
-        id: data.user.id,
-        username: trimmed,
-        role: trimmed === process.env.NEXT_PUBLIC_ADMIN_USERNAME ? 'admin' : 'student',
-      })
+      await supabase.auth.setSession(json.session)
       localStorage.setItem('lang', lang)
-      router.push('/select')
+      router.push(json.role === 'admin' ? '/admin' : '/select')
     } else {
       const { data, error: loginErr } = await supabase.auth.signInWithPassword({
-        email: email(trimmed),
+        email: fakeEmail(trimmed),
         password,
       })
       if (loginErr || !data.user) {
