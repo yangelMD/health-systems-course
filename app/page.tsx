@@ -29,7 +29,7 @@ export default function AuthPage() {
         password,
       })
       if (signUpErr || !data.user) {
-        setError(t('errorRegister', lang))
+        setError(signUpErr?.message || 'No user returned')
         setLoading(false)
         return
       }
