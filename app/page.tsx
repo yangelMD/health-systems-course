@@ -14,7 +14,7 @@ export default function AuthPage() {
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
 
-  const email = (u: string) => `${u.toLowerCase().trim()}@hsc.local`
+  const email = (u: string) => `${u.toLowerCase().trim()}@hsc-course.com`
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
