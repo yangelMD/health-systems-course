@@ -57,9 +57,9 @@ export default function AuthPage() {
         .eq('id', data.user.id)
         .single()
       localStorage.setItem('lang', lang)
-      const role = profile?.role ?? (trimmed === process.env.NEXT_PUBLIC_ADMIN_USERNAME ? 'admin' : 'student')
-      localStorage.setItem('role', role)
-      router.push(role === 'admin' ? '/admin' : '/select')
+      const isAdmin = trimmed === process.env.NEXT_PUBLIC_ADMIN_USERNAME
+      localStorage.setItem('role', isAdmin ? 'admin' : 'student')
+      router.push(isAdmin ? '/admin' : '/select')
     }
     setLoading(false)
   }

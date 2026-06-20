@@ -28,9 +28,9 @@ export default function AdminPage() {
   async function checkAdmin() {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) { router.push('/'); return }
-    const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).single()
-    const role = profile?.role ?? localStorage.getItem('role')
-    if (role !== 'admin') { router.push('/'); return }
+    const username = user.email?.split('@')[0]
+    const isAdmin = username === process.env.NEXT_PUBLIC_ADMIN_USERNAME || localStorage.getItem('role') === 'admin'
+    if (!isAdmin) { router.push('/'); return }
     await loadStudents()
   }
 
