@@ -268,10 +268,6 @@ export default function QuizPage() {
                 className="w-full bg-emerald-600 hover:bg-emerald-700 text-white py-2 rounded-xl text-sm font-medium transition">
                 📊 {t('exportExcel', lang)}
               </button>
-              <button onClick={() => handleExport('word')}
-                className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-xl text-sm font-medium transition">
-                📄 {t('exportWord', lang)}
-              </button>
               <p className="text-center text-xs text-gray-400 pt-1">{lang === 'he' ? '© יואל אנג\'ל MD MBA' : '© Yoel Angel MD MBA'}</p>
             </div>
           </aside>
