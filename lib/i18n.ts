@@ -27,7 +27,6 @@ export const UI: Record<string, Record<Lang, string>> = {
   adminPanel: { en: 'Admin Panel', he: 'פאנל ניהול' },
   students: { en: 'Students', he: 'סטודנטים' },
   completion: { en: 'Completion', he: 'השלמה' },
-  viewAnswers: { en: 'View Answers', he: 'צפה בתשובות' },
   deleteUser: { en: 'Delete', he: 'מחק' },
   feedbackLoading: { en: 'Analyzing your answer…', he: 'מנתח את תשובתך…' },
   hintTitle: { en: 'Hint', he: 'רמז' },

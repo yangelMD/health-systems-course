@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import Anthropic from '@anthropic-ai/sdk'
 import { createClient } from '@supabase/supabase-js'
-import { DEFAULT_PROMPT } from '../admin/prompt/route'
+import { DEFAULT_PROMPT } from '@/lib/defaultPrompt'
 
 const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
 const admin = createClient(
