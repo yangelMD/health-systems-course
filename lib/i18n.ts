@@ -1,7 +1,9 @@
 import type { Lang } from './types'
 
 export const UI: Record<string, Record<Lang, string>> = {
-  appTitle: { en: 'Comparative Health Systems', he: 'מערכות בריאות בעולם' },
+  appTitle: { en: 'Comparative Health Systems Course – Tel Aviv University', he: 'קורס מערכות בריאות בעולם – אוניברסיטת תל אביב' },
+  appTitleShort: { en: 'Comparative Health Systems', he: 'מערכות בריאות בעולם' },
+  copyright: { en: '© Yoel Angel MD MBA', he: '© יואל אנג\'ל MD MBA' },
   login: { en: 'Log In', he: 'התחברות' },
   register: { en: 'Register', he: 'הרשמה' },
   username: { en: 'Username', he: 'שם משתמש' },
@@ -39,6 +41,15 @@ export const UI: Record<string, Record<Lang, string>> = {
   errorRegister: { en: 'Registration failed. Username may already be taken.', he: 'ההרשמה נכשלה. ייתכן ששם המשתמש כבר תפוס.' },
   changeCountries: { en: 'Change countries', he: 'שנה מדינות' },
   confirmDelete: { en: 'Delete this user?', he: 'למחוק משתמש זה?' },
+  sources: { en: 'Sources', he: 'מקורות' },
+  sourcesTitle: { en: 'Reference Sources', he: 'מקורות מידע' },
+  viewAnswers: { en: 'View Answers', he: 'צפה בתשובות' },
+  backToList: { en: '← Back to students', he: '← חזרה לרשימה' },
+  noAnswers: { en: 'No answers yet.', he: 'אין תשובות עדיין.' },
+  promptEditor: { en: 'AI Prompt Settings', he: 'הגדרות פרומפט AI' },
+  promptLabel: { en: 'System prompt for AI feedback (sent before student answer)', he: 'פרומפט מערכת למשוב AI (נשלח לפני תשובת הסטודנט)' },
+  promptSave: { en: 'Save Prompt', he: 'שמור פרומפט' },
+  promptSaved: { en: 'Saved!', he: 'נשמר!' },
 }
 
 export function t(key: string, lang: Lang): string {

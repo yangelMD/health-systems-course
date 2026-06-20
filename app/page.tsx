@@ -75,12 +75,13 @@ export default function AuthPage() {
       </div>
 
       <div className="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-md">
-        <h1 className="text-2xl font-bold text-blue-900 mb-1 text-center">
-          {lang === 'he' ? 'מערכות בריאות בעולם' : 'Comparative Health Systems'}
+        <h1 className="text-xl font-bold text-blue-900 mb-1 text-center leading-tight">
+          {lang === 'he' ? 'קורס מערכות בריאות בעולם' : 'Comparative Health Systems Course'}
         </h1>
-        <p className="text-center text-gray-500 text-sm mb-6">
-          {lang === 'he' ? 'קורס ארגון שירותי בריאות בעולם' : 'Global Health Systems Course'}
+        <p className="text-center text-blue-700 text-sm font-medium mb-1">
+          {lang === 'he' ? 'אוניברסיטת תל אביב' : 'Tel Aviv University'}
         </p>
+        <p className="text-center text-gray-400 text-xs mb-6">{lang === 'he' ? '© יואל אנג\'ל MD MBA' : '© Yoel Angel MD MBA'}</p>
 
         {/* Tabs */}
         <div className="flex border-b mb-6">

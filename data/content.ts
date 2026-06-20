@@ -662,3 +662,49 @@ export const HINTS: Record<number, Record<string, { en: string; he: string }>> =
     },
   },
 }
+
+
+export interface Source {
+  label: string
+  url: string
+  labelHe: string
+}
+
+export const COUNTRY_SOURCES: Record<string, Source[]> = {
+  israel: [
+    { label: 'Euro Health Observatory – Israel', labelHe: 'Euro Health Observatory – ישראל', url: 'https://eurohealthobservatory.who.int/countries/israel' },
+    { label: 'OECD Health at a Glance 2025', labelHe: 'OECD Health at a Glance 2025', url: 'https://www.oecd.org/en/publications/2025/11/health-at-a-glance-2025_a894f72e.html' },
+  ],
+  germany: [
+    { label: 'Euro Health Observatory – Germany', labelHe: 'Euro Health Observatory – גרמניה', url: 'https://eurohealthobservatory.who.int/countries/germany' },
+    { label: 'OECD Health at a Glance 2025', labelHe: 'OECD Health at a Glance 2025', url: 'https://www.oecd.org/en/publications/2025/11/health-at-a-glance-2025_a894f72e.html' },
+  ],
+  uk: [
+    { label: 'Euro Health Observatory – United Kingdom', labelHe: 'Euro Health Observatory – בריטניה', url: 'https://eurohealthobservatory.who.int/countries/united-kingdom' },
+    { label: 'OECD Health at a Glance 2025', labelHe: 'OECD Health at a Glance 2025', url: 'https://www.oecd.org/en/publications/2025/11/health-at-a-glance-2025_a894f72e.html' },
+  ],
+  netherlands: [
+    { label: 'Euro Health Observatory – Netherlands', labelHe: 'Euro Health Observatory – הולנד', url: 'https://eurohealthobservatory.who.int/countries/netherlands' },
+    { label: 'OECD Health at a Glance 2025', labelHe: 'OECD Health at a Glance 2025', url: 'https://www.oecd.org/en/publications/2025/11/health-at-a-glance-2025_a894f72e.html' },
+  ],
+  usa: [
+    { label: 'OECD Health at a Glance 2025', labelHe: 'OECD Health at a Glance 2025', url: 'https://www.oecd.org/en/publications/2025/11/health-at-a-glance-2025_a894f72e.html' },
+    { label: 'Commonwealth Fund – U.S. Health System', labelHe: 'Commonwealth Fund – מערכת הבריאות האמריקאית', url: 'https://www.commonwealthfund.org/international-health-policy-center/countries/united-states' },
+  ],
+  australia: [
+    { label: 'OECD Health at a Glance 2025', labelHe: 'OECD Health at a Glance 2025', url: 'https://www.oecd.org/en/publications/2025/11/health-at-a-glance-2025_a894f72e.html' },
+    { label: 'Australian Institute of Health and Welfare', labelHe: 'המכון האוסטרלי לבריאות ורווחה', url: 'https://www.aihw.gov.au/reports-data/australias-health' },
+  ],
+  singapore: [
+    { label: 'OECD Health at a Glance 2025', labelHe: 'OECD Health at a Glance 2025', url: 'https://www.oecd.org/en/publications/2025/11/health-at-a-glance-2025_a894f72e.html' },
+    { label: 'Ministry of Health Singapore', labelHe: 'משרד הבריאות סינגפור', url: 'https://www.moh.gov.sg/home' },
+  ],
+  japan: [
+    { label: 'OECD Health at a Glance 2025', labelHe: 'OECD Health at a Glance 2025', url: 'https://www.oecd.org/en/publications/2025/11/health-at-a-glance-2025_a894f72e.html' },
+    { label: 'Commonwealth Fund – Japan', labelHe: 'Commonwealth Fund – יפן', url: 'https://www.commonwealthfund.org/international-health-policy-center/countries/japan' },
+  ],
+  canada: [
+    { label: 'OECD Health at a Glance 2025', labelHe: 'OECD Health at a Glance 2025', url: 'https://www.oecd.org/en/publications/2025/11/health-at-a-glance-2025_a894f72e.html' },
+    { label: 'Canadian Institute for Health Information', labelHe: 'המכון הקנדי למידע בריאות', url: 'https://www.cihi.ca/en/health-system-overview' },
+  ],
+}

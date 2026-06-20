@@ -2,11 +2,11 @@
 import { useEffect, useState, useCallback, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
-import { COUNTRIES, CATEGORIES, HINTS } from '@/data/content'
+import { COUNTRIES, CATEGORIES, HINTS, COUNTRY_SOURCES } from '@/data/content'
 import { t } from '@/lib/i18n'
 import type { Lang } from '@/lib/types'
 
-interface Modal { type: 'hint' | 'feedback'; text: string; loading?: boolean }
+interface Modal { type: 'hint' | 'feedback' | 'sources'; text: string; loading?: boolean; sources?: { label: string; url: string; labelHe: string }[] }
 
 export default function QuizPage() {
   const router = useRouter()
@@ -101,6 +101,11 @@ export default function QuizPage() {
     })
   }
 
+  function showSources(countryId: string) {
+    const sources = COUNTRY_SOURCES[countryId] || []
+    setModal({ type: 'sources', text: '', sources })
+  }
+
   function showHint(countryId: string) {
     const hint = HINTS[cat.id]?.[countryId]
     const text = hint ? (lang === 'he' ? hint.he : hint.en) : (lang === 'he' ? 'אין רמז זמין.' : 'No hint available.')
@@ -184,8 +189,8 @@ export default function QuizPage() {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16"/>
             </svg>
           </button>
-          <span className="font-bold text-sm sm:text-base hidden sm:block">
-            {lang === 'he' ? 'מערכות בריאות בעולם' : 'Comparative Health Systems'}
+          <span className="font-bold text-sm hidden sm:block leading-tight">
+            {lang === 'he' ? 'קורס מערכות בריאות בעולם – אוניברסיטת תל אביב' : 'Comparative Health Systems – Tel Aviv University'}
           </span>
         </div>
 
@@ -257,7 +262,7 @@ export default function QuizPage() {
               })}
             </div>
 
-            {/* Export */}
+            {/* Export + copyright */}
             <div className="p-3 border-t border-gray-100 space-y-2">
               <button onClick={() => handleExport('excel')}
                 className="w-full bg-emerald-600 hover:bg-emerald-700 text-white py-2 rounded-xl text-sm font-medium transition">
@@ -267,6 +272,7 @@ export default function QuizPage() {
                 className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-xl text-sm font-medium transition">
                 📄 {t('exportWord', lang)}
               </button>
+              <p className="text-center text-xs text-gray-400 pt-1">{lang === 'he' ? '© יואל אנג\'ל MD MBA' : '© Yoel Angel MD MBA'}</p>
             </div>
           </aside>
         )}
@@ -319,13 +325,17 @@ export default function QuizPage() {
                     rows={5}
                     className="w-full border border-gray-200 rounded-xl p-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent resize-none bg-gray-50 focus:bg-white transition"
                   />
-                  <div className="flex gap-2">
+                  <div className="flex gap-1.5 flex-wrap">
                     <button onClick={() => showHint(country.id)}
                       className="flex-1 text-xs py-2 px-2 rounded-xl border border-amber-200 text-amber-700 bg-amber-50 hover:bg-amber-100 font-medium transition">
                       💡 {t('hint', lang)}
                     </button>
+                    <button onClick={() => showSources(country.id)}
+                      className="flex-1 text-xs py-2 px-2 rounded-xl border border-teal-200 text-teal-700 bg-teal-50 hover:bg-teal-100 font-medium transition">
+                      🔗 {t('sources', lang)}
+                    </button>
                     <button onClick={() => getFeedback(country.id)}
-                      className="flex-1 text-xs py-2 px-2 rounded-xl border border-violet-200 text-violet-700 bg-violet-50 hover:bg-violet-100 font-medium transition">
+                      className="w-full text-xs py-2 px-2 rounded-xl border border-violet-200 text-violet-700 bg-violet-50 hover:bg-violet-100 font-medium transition">
                       🤖 {t('getFeedback', lang)}
                     </button>
                   </div>
@@ -341,15 +351,27 @@ export default function QuizPage() {
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4" onClick={() => setModal(null)}>
           <div dir={dir} className="bg-white rounded-2xl shadow-2xl p-6 max-w-lg w-full" onClick={e => e.stopPropagation()}>
             <h3 className="font-bold text-blue-900 mb-3 text-lg">
-              {modal.type === 'hint' ? `💡 ${t('hintTitle', lang)}` : `🤖 ${t('feedbackTitle', lang)}`}
+              {modal.type === 'hint' ? `💡 ${t('hintTitle', lang)}` : modal.type === 'sources' ? `🔗 ${t('sourcesTitle', lang)}` : `🤖 ${t('feedbackTitle', lang)}`}
             </h3>
-            {modal.loading
-              ? <div className="flex items-center gap-3 text-gray-500 py-4">
-                  <div className="animate-spin h-5 w-5 border-2 border-blue-500 border-t-transparent rounded-full"/>
-                  {t('feedbackLoading', lang)}
-                </div>
-              : <p className="text-gray-700 text-sm leading-relaxed whitespace-pre-wrap">{modal.text}</p>
-            }
+            {modal.type === 'sources' ? (
+              <div className="space-y-3">
+                {(modal.sources || []).map((s, i) => (
+                  <a key={i} href={s.url} target="_blank" rel="noopener noreferrer"
+                    className="flex items-center gap-2 p-3 rounded-xl border border-gray-200 hover:border-blue-300 hover:bg-blue-50 transition text-sm text-blue-700 font-medium">
+                    <span className="text-lg">📖</span>
+                    <span>{lang === 'he' ? s.labelHe : s.label}</span>
+                    <span className="ms-auto text-gray-400 text-xs">↗</span>
+                  </a>
+                ))}
+              </div>
+            ) : modal.loading ? (
+              <div className="flex items-center gap-3 text-gray-500 py-4">
+                <div className="animate-spin h-5 w-5 border-2 border-blue-500 border-t-transparent rounded-full"/>
+                {t('feedbackLoading', lang)}
+              </div>
+            ) : (
+              <p className="text-gray-700 text-sm leading-relaxed whitespace-pre-wrap">{modal.text}</p>
+            )}
             {!modal.loading && (
               <button onClick={() => setModal(null)}
                 className="mt-5 w-full bg-gray-100 hover:bg-gray-200 py-2.5 rounded-xl text-sm font-medium transition">
