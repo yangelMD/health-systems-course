@@ -50,13 +50,17 @@ export default function AuthPage() {
         return
       }
       // check if admin
-      const { data: profile } = await supabase
+      const { data: profile, error: profileErr } = await supabase
         .from('profiles')
         .select('role')
         .eq('id', data.user.id)
         .single()
       localStorage.setItem('lang', lang)
       if (profile?.role === 'admin') {
+        router.push('/admin')
+      } else if (trimmed === process.env.NEXT_PUBLIC_ADMIN_USERNAME) {
+        // fallback: username matches admin username, fix role and redirect
+        await supabase.from('profiles').update({ role: 'admin' }).eq('id', data.user.id)
         router.push('/admin')
       } else {
         router.push('/select')
