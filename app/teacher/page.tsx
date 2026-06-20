@@ -1,14 +1,11 @@
 'use client'
 import { useEffect, useRef, useState } from 'react'
-import { useRouter } from 'next/navigation'
-import { supabase } from '@/lib/supabase'
 import type { Lang } from '@/lib/types'
 
 interface Message { role: 'user' | 'assistant'; content: string }
 interface HintOverride { category: string; country: string; en: string; he: string }
 
 export default function TeacherPage() {
-  const router = useRouter()
   const [lang, setLang] = useState<Lang>('he')
   const [messages, setMessages] = useState<Message[]>([])
   const [input, setInput] = useState('')
@@ -24,23 +21,15 @@ export default function TeacherPage() {
     const l = (localStorage.getItem('lang') as Lang) || 'he'
     setLang(l)
     ;(async () => {
-      const { data: { user } } = await supabase.auth.getUser()
-      if (!user) { router.push('/'); return }
-      const role = localStorage.getItem('role')
-      const username = user.email?.split('@')[0]
-      const isAdmin = username === process.env.NEXT_PUBLIC_ADMIN_USERNAME
-      if (role !== 'teacher' && role !== 'admin' && !isAdmin) { router.push('/'); return }
-
-      const [msgsRes, guidelinesRes] = await Promise.all([
+      const [msgsRes] = await Promise.all([
         fetch('/api/teacher/chat'),
-        fetch('/api/admin/prompt'),
       ])
       const msgs = await msgsRes.json()
       setMessages(msgs)
       setPageLoading(false)
       loadGuidelines()
     })()
-  }, [router])
+  }, [])
 
   async function loadGuidelines() {
     const res = await fetch('/api/teacher/guidelines')
@@ -112,10 +101,6 @@ export default function TeacherPage() {
             className={`px-2 py-1 rounded text-xs font-bold ${lang==='en' ? 'bg-white text-blue-900' : 'bg-white/10 hover:bg-white/20'}`}>EN</button>
           <button onClick={() => { setLang('he'); localStorage.setItem('lang','he') }}
             className={`px-2 py-1 rounded text-xs font-bold ${lang==='he' ? 'bg-white text-blue-900' : 'bg-white/10 hover:bg-white/20'}`}>עב</button>
-          <button onClick={async () => { await supabase.auth.signOut(); router.push('/') }}
-            className="bg-red-500/80 hover:bg-red-500 px-2 py-1 rounded text-xs">
-            {lang === 'he' ? 'התנתק' : 'Log out'}
-          </button>
         </div>
       </header>
 
