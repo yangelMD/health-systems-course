@@ -29,7 +29,8 @@ export default function AdminPage() {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) { router.push('/'); return }
     const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).single()
-    if (profile?.role !== 'admin') { router.push('/'); return }
+    const role = profile?.role ?? localStorage.getItem('role')
+    if (role !== 'admin') { router.push('/'); return }
     await loadStudents()
   }
 

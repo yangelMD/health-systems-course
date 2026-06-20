@@ -38,6 +38,7 @@ export default function AuthPage() {
       }
       await supabase.auth.setSession(json.session)
       localStorage.setItem('lang', lang)
+      localStorage.setItem('role', json.role)
       router.push(json.role === 'admin' ? '/admin' : '/select')
     } else {
       const { data, error: loginErr } = await supabase.auth.signInWithPassword({
@@ -56,15 +57,9 @@ export default function AuthPage() {
         .eq('id', data.user.id)
         .single()
       localStorage.setItem('lang', lang)
-      if (profile?.role === 'admin') {
-        router.push('/admin')
-      } else if (trimmed === process.env.NEXT_PUBLIC_ADMIN_USERNAME) {
-        // fallback: username matches admin username, fix role and redirect
-        await supabase.from('profiles').update({ role: 'admin' }).eq('id', data.user.id)
-        router.push('/admin')
-      } else {
-        router.push('/select')
-      }
+      const role = profile?.role ?? (trimmed === process.env.NEXT_PUBLIC_ADMIN_USERNAME ? 'admin' : 'student')
+      localStorage.setItem('role', role)
+      router.push(role === 'admin' ? '/admin' : '/select')
     }
     setLoading(false)
   }
