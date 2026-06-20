@@ -127,7 +127,7 @@ export default function QuizPage() {
       const res = await fetch('/api/feedback', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ answer: answerText, country: countryName, category: catName, lang }),
+        body: JSON.stringify({ answer: answerText, country: countryName, category: catName, categoryId: cat.id, countryId, lang }),
       })
       const { feedback } = await res.json()
       setModal({ type: 'feedback', text: feedback })
