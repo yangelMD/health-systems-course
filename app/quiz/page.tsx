@@ -2,7 +2,7 @@
 import { useEffect, useState, useCallback, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
-import { COUNTRIES, CATEGORIES, HINTS, COUNTRY_SOURCES } from '@/data/content'
+import { COUNTRIES, CATEGORIES, COUNTRY_SOURCES } from '@/data/content'
 import { t } from '@/lib/i18n'
 import type { Lang } from '@/lib/types'
 
@@ -20,6 +20,7 @@ export default function QuizPage() {
   const [loading, setLoading] = useState(true)
   const [sidebarOpen, setSidebarOpen] = useState(true)
   const [countryMenuOpen, setCountryMenuOpen] = useState(false)
+  const [hints, setHints] = useState<Record<number, Record<string, { en: string; he: string }>>>({})
   const saveTimers = useRef<Record<string, ReturnType<typeof setTimeout>>>({})
 
   const key = (country: string, catId: number) => `${country}::${catId}`
@@ -32,15 +33,18 @@ export default function QuizPage() {
       if (!user) { router.push('/'); return }
       setUserId(user.id)
 
-      const [countriesRes, answersRes] = await Promise.all([
+      const [countriesRes, answersRes, hintsRes] = await Promise.all([
         fetch(`/api/countries?userId=${user.id}`),
         fetch(`/api/answers?userId=${user.id}`),
+        fetch('/api/hints'),
       ])
       const countries = await countriesRes.json()
       const ans = await answersRes.json()
 
       if (!countries?.length) { router.push('/select'); return }
       setSelectedCountries(countries)
+      const hintsData = await hintsRes.json()
+      setHints(hintsData)
 
       const ansMap: Record<string, string> = {}
       const saved = new Set<string>()
@@ -107,7 +111,7 @@ export default function QuizPage() {
   }
 
   function showHint(countryId: string) {
-    const hint = HINTS[cat.id]?.[countryId]
+    const hint = hints[cat.id]?.[countryId]
     const text = hint ? (lang === 'he' ? hint.he : hint.en) : (lang === 'he' ? 'אין רמז זמין.' : 'No hint available.')
     setModal({ type: 'hint', text })
   }

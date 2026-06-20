@@ -9,21 +9,33 @@ const admin = createClient(
   { auth: { autoRefreshToken: false, persistSession: false } }
 )
 
-const SYSTEM = `You are an AI teaching assistant helping university instructors fine-tune the AI feedback given to students in a Comparative Health Systems course at Tel Aviv University.
+const SYSTEM = `You are an AI teaching assistant helping university instructors fine-tune the AI feedback and hints given to students in a Comparative Health Systems course at Tel Aviv University.
 
 The course covers 9 countries (Israel, Germany, UK, USA, Australia, Singapore, Japan, Netherlands, Canada) across 15 categories of health system comparison.
 
+Country IDs: israel, germany, uk, usa, australia, singapore, japan, netherlands, canada
+Category IDs: 1=Coverage & Entitlement, 2=Financing, 3=Provider Payment, 4=Delivery System, 5=Gatekeeping, 6=Pharmaceutical Policy, 7=Long-term Care, 8=Mental Health, 9=Public Health, 10=Health Outcomes, 11=Equity, 12=Patient Choice, 13=Technology & Innovation, 14=Governance, 15=COVID-19 Response
+
 Your role:
-1. Have a natural conversation with instructors about the quality of AI feedback students receive.
-2. When an instructor points out a problem (feedback too long, missing a key point, wrong emphasis, etc.), acknowledge it and explain how you'll adjust.
-3. After each exchange where the instructor gives guidance, output a JSON block at the END of your response in this exact format (only when guidelines change):
+1. Have a natural conversation with instructors about the quality of AI feedback and hints students receive.
+2. When an instructor gives guidance about AI FEEDBACK quality (too long, missing a point, wrong emphasis, etc.), update the guidelines.
+3. When an instructor wants to change a HINT (the pre-written hint text students see when clicking 💡), update the hint overrides.
+4. At the END of your response, output any changed blocks:
+
+For feedback guideline changes:
 <guidelines>
 {"action": "update", "guidelines": ["guideline 1", "guideline 2", ...]}
 </guidelines>
-The guidelines array should be the COMPLETE updated list of all active guidelines (not just the new one).
-4. If no guidelines changed, do not include the <guidelines> block.
-5. Be conversational, helpful, and specific about health systems content when relevant.
-6. You can discuss specific countries, categories, or types of feedback.`
+The array must be the COMPLETE updated list of all active guidelines.
+
+For hint changes:
+<hints>
+{"categoryId": 1, "countryId": "germany", "en": "Updated English hint text...", "he": "טקסט רמז מעודכן בעברית..."}
+</hints>
+You can output multiple <hints> blocks if changing several hints at once.
+
+5. Only output these blocks when something actually changed.
+6. Be conversational, helpful, and specific about health systems content when relevant.`
 
 export async function GET() {
   const { data: messages } = await admin
@@ -74,9 +86,12 @@ ${currentGuidelines.length ? currentGuidelines.map((g, i) => `${i + 1}. ${g}`).j
 
   const assistantText = (response.content[0] as { type: string; text: string }).text
 
-  // Extract guidelines if present
   const guidelinesMatch = assistantText.match(/<guidelines>([\s\S]*?)<\/guidelines>/)
-  let displayText = assistantText.replace(/<guidelines>[\s\S]*?<\/guidelines>/g, '').trim()
+  const hintsMatches = [...assistantText.matchAll(/<hints>([\s\S]*?)<\/hints>/g)]
+  let displayText = assistantText
+    .replace(/<guidelines>[\s\S]*?<\/guidelines>/g, '')
+    .replace(/<hints>[\s\S]*?<\/hints>/g, '')
+    .trim()
 
   if (guidelinesMatch) {
     try {
@@ -88,6 +103,29 @@ ${currentGuidelines.length ? currentGuidelines.map((g, i) => `${i + 1}. ${g}`).j
         )
       }
     } catch {}
+  }
+
+  if (hintsMatches.length > 0) {
+    const { data: existing } = await admin.from('settings').select('value').eq('key', 'hint_overrides').single()
+    const overrides: Record<string, Record<string, { en: string; he: string }>> = existing?.value
+      ? JSON.parse(existing.value)
+      : {}
+
+    for (const m of hintsMatches) {
+      try {
+        const h = JSON.parse(m[1].trim())
+        if (h.categoryId && h.countryId) {
+          const catKey = String(h.categoryId)
+          if (!overrides[catKey]) overrides[catKey] = {}
+          overrides[catKey][h.countryId] = { en: h.en, he: h.he }
+        }
+      } catch {}
+    }
+
+    await admin.from('settings').upsert(
+      { key: 'hint_overrides', value: JSON.stringify(overrides) },
+      { onConflict: 'key' }
+    )
   }
 
   // Save assistant message (without the guidelines block)

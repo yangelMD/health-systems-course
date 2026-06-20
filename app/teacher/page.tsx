@@ -5,6 +5,7 @@ import { supabase } from '@/lib/supabase'
 import type { Lang } from '@/lib/types'
 
 interface Message { role: 'user' | 'assistant'; content: string }
+interface HintOverride { category: string; country: string; en: string; he: string }
 
 export default function TeacherPage() {
   const router = useRouter()
@@ -14,7 +15,9 @@ export default function TeacherPage() {
   const [loading, setLoading] = useState(false)
   const [pageLoading, setPageLoading] = useState(true)
   const [guidelines, setGuidelines] = useState<string[]>([])
+  const [hintOverrides, setHintOverrides] = useState<HintOverride[]>([])
   const [showGuidelines, setShowGuidelines] = useState(false)
+  const [panelTab, setPanelTab] = useState<'guidelines' | 'hints'>('guidelines')
   const bottomRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -44,6 +47,7 @@ export default function TeacherPage() {
     if (res.ok) {
       const data = await res.json()
       setGuidelines(data.guidelines || [])
+      setHintOverrides(data.hintOverrides || [])
     }
   }
 
@@ -100,7 +104,9 @@ export default function TeacherPage() {
         <div className="flex items-center gap-2">
           <button onClick={() => setShowGuidelines(g => !g)}
             className="bg-white/10 hover:bg-white/20 px-2 py-1 rounded text-xs font-medium transition">
-            📋 {guidelines.length > 0 ? `${guidelines.length} ${lang === 'he' ? 'הנחיות' : 'guidelines'}` : (lang === 'he' ? 'הנחיות' : 'Guidelines')}
+            📋 {guidelines.length + hintOverrides.length > 0
+              ? `${guidelines.length + hintOverrides.length} ${lang === 'he' ? 'הגדרות' : 'settings'}`
+              : (lang === 'he' ? 'הגדרות' : 'Settings')}
           </button>
           <button onClick={() => { setLang('en'); localStorage.setItem('lang','en') }}
             className={`px-2 py-1 rounded text-xs font-bold ${lang==='en' ? 'bg-white text-blue-900' : 'bg-white/10 hover:bg-white/20'}`}>EN</button>
@@ -116,29 +122,59 @@ export default function TeacherPage() {
       <div className="flex flex-1 overflow-hidden" style={{ height: 'calc(100vh - 56px)' }}>
         {/* Guidelines panel */}
         {showGuidelines && (
-          <aside className="w-72 bg-white border-e border-gray-200 flex flex-col overflow-y-auto shadow-lg">
-            <div className="p-4 border-b border-gray-100">
-              <h2 className="font-bold text-blue-900 text-sm">
-                {lang === 'he' ? '📋 הנחיות פעילות' : '📋 Active Guidelines'}
-              </h2>
-              <p className="text-xs text-gray-500 mt-1">
-                {lang === 'he' ? 'הנחיות אלו נשלחות ל-AI בכל בקשת משוב' : 'These are sent to the AI with every feedback request'}
-              </p>
+          <aside className="w-80 bg-white border-e border-gray-200 flex flex-col overflow-hidden shadow-lg">
+            <div className="p-3 border-b border-gray-100 flex gap-1">
+              <button onClick={() => setPanelTab('guidelines')}
+                className={`flex-1 text-xs font-medium py-1.5 rounded-lg transition ${panelTab === 'guidelines' ? 'bg-blue-600 text-white' : 'text-gray-500 hover:bg-gray-100'}`}>
+                📋 {lang === 'he' ? `הנחיות (${guidelines.length})` : `Guidelines (${guidelines.length})`}
+              </button>
+              <button onClick={() => setPanelTab('hints')}
+                className={`flex-1 text-xs font-medium py-1.5 rounded-lg transition ${panelTab === 'hints' ? 'bg-blue-600 text-white' : 'text-gray-500 hover:bg-gray-100'}`}>
+                💡 {lang === 'he' ? `רמזים (${hintOverrides.length})` : `Hints (${hintOverrides.length})`}
+              </button>
             </div>
-            <div className="flex-1 p-4">
-              {guidelines.length === 0 ? (
-                <p className="text-sm text-gray-400 italic">
-                  {lang === 'he' ? 'אין הנחיות עדיין. שוחח עם ה-AI כדי להוסיף.' : 'No guidelines yet. Chat with the AI to add some.'}
-                </p>
-              ) : (
-                <ol className="space-y-3">
-                  {guidelines.map((g, i) => (
-                    <li key={i} className="flex gap-2 text-sm text-gray-700">
-                      <span className="font-bold text-blue-600 flex-shrink-0">{i + 1}.</span>
-                      <span>{g}</span>
-                    </li>
-                  ))}
-                </ol>
+            <div className="flex-1 overflow-y-auto p-4">
+              {panelTab === 'guidelines' && (
+                <>
+                  <p className="text-xs text-gray-400 mb-3">
+                    {lang === 'he' ? 'נשלחות ל-AI בכל בקשת משוב סטודנט' : 'Sent to AI with every student feedback request'}
+                  </p>
+                  {guidelines.length === 0 ? (
+                    <p className="text-sm text-gray-400 italic">
+                      {lang === 'he' ? 'אין הנחיות עדיין. שוחח עם ה-AI כדי להוסיף.' : 'No guidelines yet. Chat with the AI to add some.'}
+                    </p>
+                  ) : (
+                    <ol className="space-y-3">
+                      {guidelines.map((g, i) => (
+                        <li key={i} className="flex gap-2 text-sm text-gray-700">
+                          <span className="font-bold text-blue-600 flex-shrink-0">{i + 1}.</span>
+                          <span>{g}</span>
+                        </li>
+                      ))}
+                    </ol>
+                  )}
+                </>
+              )}
+              {panelTab === 'hints' && (
+                <>
+                  <p className="text-xs text-gray-400 mb-3">
+                    {lang === 'he' ? 'רמזים שעודכנו מעל ברירת המחדל' : 'Hints overriding the defaults'}
+                  </p>
+                  {hintOverrides.length === 0 ? (
+                    <p className="text-sm text-gray-400 italic">
+                      {lang === 'he' ? 'אין רמזים מותאמים עדיין.' : 'No hint overrides yet. Ask me to update a hint.'}
+                    </p>
+                  ) : (
+                    <div className="space-y-4">
+                      {hintOverrides.map((h, i) => (
+                        <div key={i} className="border border-gray-100 rounded-xl p-3 bg-gray-50">
+                          <div className="text-xs font-bold text-blue-700 mb-1">{h.country} — {h.category}</div>
+                          <p className="text-xs text-gray-600 leading-relaxed">{lang === 'he' ? h.he : h.en}</p>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </>
               )}
             </div>
           </aside>
@@ -163,7 +199,7 @@ export default function TeacherPage() {
                   {[
                     lang === 'he' ? 'המשוב ארוך מדי, קצר יותר' : 'Feedback is too long, make it shorter',
                     lang === 'he' ? 'הוסף השוואה לישראל תמיד' : 'Always add a comparison to Israel',
-                    lang === 'he' ? 'התמקד בהיבטים הפיננסיים' : 'Focus more on financial aspects',
+                    lang === 'he' ? 'עדכן את הרמז על גרמניה בקטגוריה 1' : 'Update the hint for Germany in category 1',
                     lang === 'he' ? 'אל תחשוף את התשובה הנכונה' : 'Never reveal the model answer directly',
                   ].map((s, i) => (
                     <button key={i} onClick={() => setInput(s)}
