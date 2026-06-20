@@ -32,3 +32,9 @@ export async function DELETE(req: NextRequest) {
   await admin.auth.admin.deleteUser(id)
   return NextResponse.json({ ok: true })
 }
+
+export async function PATCH(req: NextRequest) {
+  const { id, role } = await req.json()
+  await admin.from('profiles').update({ role }).eq('id', id)
+  return NextResponse.json({ ok: true })
+}

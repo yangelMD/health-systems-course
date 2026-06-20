@@ -14,8 +14,12 @@ const admin = createClient(
 export async function POST(req: NextRequest) {
   const { answer, country, category, categoryId, countryId, lang } = await req.json()
 
-  const { data: setting } = await admin.from('settings').select('value').eq('key', 'ai_prompt').single()
+  const [{ data: setting }, { data: guidelinesSetting }] = await Promise.all([
+    admin.from('settings').select('value').eq('key', 'ai_prompt').single(),
+    admin.from('settings').select('value').eq('key', 'teacher_guidelines').single(),
+  ])
   const basePrompt = setting?.value || DEFAULT_PROMPT
+  const guidelines = guidelinesSetting?.value ? JSON.parse(guidelinesSetting.value) as string[] : []
 
   const modelAnswer = categoryId && countryId ? ANSWERS[categoryId]?.[countryId] : null
   const modelText = modelAnswer ? (lang === 'he' ? modelAnswer.he : modelAnswer.en) : null
@@ -24,7 +28,7 @@ export async function POST(req: NextRequest) {
 
 Country: ${country}
 Category: ${category}
-Language: ${lang === 'he' ? 'Hebrew' : 'English'}${modelText ? `\n\nModel answer for reference (do not reveal this verbatim to the student):\n${modelText}` : ''}`
+Language: ${lang === 'he' ? 'Hebrew' : 'English'}${guidelines.length ? `\n\nInstructor guidelines for feedback (follow these carefully):\n${guidelines.map((g, i) => `${i + 1}. ${g}`).join('\n')}` : ''}${modelText ? `\n\nModel answer for reference (do not reveal this verbatim to the student):\n${modelText}` : ''}`
 
   try {
     const msg = await client.messages.create({

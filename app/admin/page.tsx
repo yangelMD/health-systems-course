@@ -28,7 +28,7 @@ export default function AdminPage() {
   const [loading, setLoading] = useState(true)
   const [detail, setDetail] = useState<StudentDetail | null>(null)
   const [tab, setTab] = useState<Tab>('students')
-  const [prompt, setPrompt] = useState('')
+  const [aiPrompt, setAiPrompt] = useState('')
   const [promptSaved, setPromptSaved] = useState(false)
   const [detailCatIndex, setDetailCatIndex] = useState(0)
 
@@ -62,14 +62,14 @@ export default function AdminPage() {
   async function loadPrompt() {
     const res = await fetch('/api/admin/prompt')
     const data = await res.json()
-    setPrompt(data.prompt)
+    setAiPrompt(data.prompt)
   }
 
   async function savePrompt() {
     await fetch('/api/admin/prompt', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ prompt }),
+      body: JSON.stringify({ prompt: aiPrompt }),
     })
     setPromptSaved(true)
     setTimeout(() => setPromptSaved(false), 2000)
@@ -83,6 +83,29 @@ export default function AdminPage() {
       body: JSON.stringify({ id }),
     })
     setRows(r => r.filter(x => x.profile.id !== id))
+  }
+
+  async function resetPassword(id: string, username: string) {
+    const newPassword = prompt(lang === 'he' ? `סיסמה חדשה עבור ${username}:` : `New password for ${username}:`)
+    if (!newPassword) return
+    const res = await fetch('/api/admin/reset-password', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ userId: id, newPassword }),
+    })
+    const data = await res.json()
+    if (data.error) alert(data.error)
+    else alert(lang === 'he' ? 'הסיסמה אופסה בהצלחה' : 'Password reset successfully')
+  }
+
+  async function toggleTeacherRole(id: string, currentRole: string) {
+    const newRole = currentRole === 'teacher' ? 'student' : 'teacher'
+    await fetch('/api/admin/students', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id, role: newRole }),
+    })
+    setRows(r => r.map(x => x.profile.id === id ? { ...x, profile: { ...x.profile, role: newRole } } : x))
   }
 
   async function viewStudent(row: StudentRow) {
@@ -179,7 +202,11 @@ export default function AdminPage() {
       <div className="p-6 max-w-5xl mx-auto w-full">
         {/* Tabs */}
         <div className="flex gap-1 mb-6 bg-white rounded-xl shadow-sm p-1 w-fit">
-          {(['students', 'prompt'] as Tab[]).map(t_ => (
+          <a href="/teacher"
+          className="px-4 py-2 rounded-lg text-sm font-medium text-violet-700 bg-violet-50 hover:bg-violet-100 border border-violet-200 transition ms-auto">
+          👩‍🏫 {lang === 'he' ? 'ממשק מורים' : 'Teacher Interface'} ↗
+        </a>
+        {(['students', 'prompt'] as Tab[]).map(t_ => (
             <button key={t_} onClick={() => setTab(t_)}
               className={`px-4 py-2 rounded-lg text-sm font-medium transition ${tab === t_ ? 'bg-blue-600 text-white shadow' : 'text-gray-600 hover:bg-gray-100'}`}>
               {t_ === 'students' ? (lang === 'he' ? '👥 סטודנטים' : '👥 Students') : (lang === 'he' ? '🤖 הגדרות AI' : '🤖 AI Settings')}
@@ -195,7 +222,8 @@ export default function AdminPage() {
                   <th className="px-4 py-3 text-start font-semibold">{t('username', lang)}</th>
                   <th className="px-4 py-3 text-center font-semibold">{lang === 'he' ? 'מדינות' : 'Countries'}</th>
                   <th className="px-4 py-3 text-center font-semibold">{t('completion', lang)}</th>
-                  <th className="px-4 py-3 text-center font-semibold">{lang === 'he' ? 'פעולות' : 'Actions'}</th>
+                  <th className="px-4 py-3 text-center font-semibold">{lang === 'he' ? 'תפקיד' : 'Role'}</th>
+              <th className="px-4 py-3 text-center font-semibold">{lang === 'he' ? 'פעולות' : 'Actions'}</th>
                 </tr>
               </thead>
               <tbody>
@@ -214,14 +242,24 @@ export default function AdminPage() {
                         </div>
                       </td>
                       <td className="px-4 py-3 text-center">
-                        <div className="flex items-center justify-center gap-2">
+                        <button onClick={() => toggleTeacherRole(row.profile.id, row.profile.role)}
+                          className={`text-xs px-2 py-1 rounded-lg font-medium transition ${row.profile.role === 'teacher' ? 'bg-violet-100 text-violet-700 hover:bg-violet-200' : 'bg-gray-100 text-gray-500 hover:bg-gray-200'}`}>
+                          {row.profile.role === 'teacher' ? '👩‍🏫 Teacher' : 'Student'}
+                        </button>
+                      </td>
+                      <td className="px-4 py-3 text-center">
+                        <div className="flex items-center justify-center gap-1 flex-wrap">
                           <button onClick={() => viewStudent(row)}
                             className="text-blue-600 hover:text-blue-800 text-xs font-medium px-2 py-1 rounded hover:bg-blue-50 transition">
-                            👁 {t('viewAnswers', lang)}
+                            👁
+                          </button>
+                          <button onClick={() => resetPassword(row.profile.id, row.profile.username)}
+                            className="text-amber-600 hover:text-amber-800 text-xs font-medium px-2 py-1 rounded hover:bg-amber-50 transition">
+                            🔑
                           </button>
                           <button onClick={() => deleteUser(row.profile.id)}
                             className="text-red-500 hover:text-red-700 text-xs font-medium px-2 py-1 rounded hover:bg-red-50 transition">
-                            🗑 {t('deleteUser', lang)}
+                            🗑
                           </button>
                         </div>
                       </td>
@@ -241,8 +279,8 @@ export default function AdminPage() {
             <h2 className="font-bold text-blue-900 text-lg mb-1">{t('promptEditor', lang)}</h2>
             <p className="text-gray-500 text-sm mb-4">{t('promptLabel', lang)}</p>
             <textarea
-              value={prompt}
-              onChange={e => setPrompt(e.target.value)}
+              value={aiPrompt}
+              onChange={e => setAiPrompt(e.target.value)}
               rows={12}
               className="w-full border border-gray-200 rounded-xl p-4 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-blue-400 resize-y bg-gray-50"
             />

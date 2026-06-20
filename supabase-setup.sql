@@ -41,3 +41,11 @@ create policy "admin read answers" on answers for select using (
 
 -- Selected countries: users own their selection
 create policy "own countries" on selected_countries for all using (auth.uid() = user_id);
+
+-- Teacher chatbot tables
+create table if not exists teacher_messages (
+  id uuid default gen_random_uuid() primary key,
+  role text not null check (role in ('user', 'assistant')),
+  content text not null,
+  created_at timestamptz default now()
+);
