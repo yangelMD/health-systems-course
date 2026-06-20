@@ -19,12 +19,9 @@ export default function SelectPage() {
     ;(async () => {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) { router.push('/'); return }
-      const { data } = await supabase
-        .from('selected_countries')
-        .select('countries')
-        .eq('user_id', user.id)
-        .single()
-      if (data?.countries?.length) setSelected(data.countries)
+      const res = await fetch(`/api/countries?userId=${user.id}`)
+      const countries = await res.json()
+      if (countries?.length) setSelected(countries)
       setLoading(false)
     })()
   }, [router])
@@ -38,7 +35,11 @@ export default function SelectPage() {
     if (selected.length === 0) { setError(t('selectAtLeast', lang)); return }
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) { router.push('/'); return }
-    await supabase.from('selected_countries').upsert({ user_id: user.id, countries: selected })
+    await fetch('/api/countries', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ userId: user.id, countries: selected }),
+    })
     router.push('/quiz')
   }
 

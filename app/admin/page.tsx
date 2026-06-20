@@ -35,32 +35,25 @@ export default function AdminPage() {
   }
 
   async function loadStudents() {
-    const { data: profiles } = await supabase.from('profiles').select('*').eq('role', 'student')
-    if (!profiles) { setLoading(false); return }
-
-    const studentRows: StudentRow[] = []
-    for (const p of profiles) {
-      const [{ data: sc }, { data: ans }] = await Promise.all([
-        supabase.from('selected_countries').select('countries').eq('user_id', p.id).single(),
-        supabase.from('answers').select('id', { count: 'exact' }).eq('user_id', p.id).neq('answer_text', ''),
-      ])
-      const countries = sc?.countries || []
-      const totalCells = countries.length * CATEGORIES.length
-      studentRows.push({
-        profile: p,
-        answeredCount: (ans as any)?.length || 0,
-        totalCells,
-        selectedCountries: countries,
-      })
-    }
+    const res = await fetch('/api/admin/students')
+    const data = await res.json()
+    const studentRows = data.map((r: any) => ({
+      profile: r.profile,
+      answeredCount: r.answeredCount,
+      totalCells: r.selectedCountries.length * CATEGORIES.length,
+      selectedCountries: r.selectedCountries,
+    }))
     setRows(studentRows)
     setLoading(false)
   }
 
   async function deleteUser(id: string) {
     if (!confirm(t('confirmDelete', lang))) return
-    await supabase.from('profiles').delete().eq('id', id)
-    await supabase.auth.admin.deleteUser(id)
+    await fetch('/api/admin/students', {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id }),
+    })
     setRows(r => r.filter(x => x.profile.id !== id))
   }
 
