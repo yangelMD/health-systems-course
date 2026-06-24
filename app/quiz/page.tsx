@@ -18,7 +18,7 @@ export default function QuizPage() {
   const [savedKeys, setSavedKeys] = useState<Set<string>>(new Set())
   const [modal, setModal] = useState<Modal | null>(null)
   const [loading, setLoading] = useState(true)
-  const [sidebarOpen, setSidebarOpen] = useState(true)
+  const [sidebarOpen, setSidebarOpen] = useState(false)
   const [countryMenuOpen, setCountryMenuOpen] = useState(false)
   const [hints, setHints] = useState<Record<number, Record<string, { en: string; he: string }>>>({})
   const saveTimers = useRef<Record<string, ReturnType<typeof setTimeout>>>({})
@@ -28,6 +28,8 @@ export default function QuizPage() {
   useEffect(() => {
     const l = (localStorage.getItem('lang') as Lang) || 'he'
     setLang(l)
+    // Open sidebar by default on desktop
+    if (window.innerWidth >= 768) setSidebarOpen(true)
     ;(async () => {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) { router.push('/'); return }
@@ -151,6 +153,12 @@ export default function QuizPage() {
     return 'started'
   }
 
+  function navToCategory(i: number) {
+    setCatIndex(i)
+    // Close sidebar on mobile after selecting
+    if (window.innerWidth < 768) setSidebarOpen(false)
+  }
+
   let total = 0, done = 0
   for (const c of CATEGORIES) {
     for (const co of selectedCountries) {
@@ -161,7 +169,7 @@ export default function QuizPage() {
   const pct = total ? Math.round((done / total) * 100) : 0
   const dir = lang === 'he' ? 'rtl' : 'ltr'
 
-  async function handleExport(fmt: 'excel' | 'word') {
+  async function handleExport() {
     const res = await fetch('/api/export', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -171,7 +179,7 @@ export default function QuizPage() {
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
     a.href = url
-    a.download = fmt === 'excel' ? 'health-systems.xlsx' : 'health-systems.docx'
+    a.download = 'health-systems.xlsx'
     a.click()
     URL.revokeObjectURL(url)
   }
@@ -185,22 +193,28 @@ export default function QuizPage() {
   return (
     <div dir={dir} className="min-h-screen bg-gray-100 flex flex-col">
       {/* Header */}
-      <header className="bg-gradient-to-r from-blue-950 to-blue-800 text-white px-4 py-3 flex items-center justify-between shadow-lg z-20 sticky top-0">
-        <div className="flex items-center gap-3">
+      <header className="bg-gradient-to-r from-blue-950 to-blue-800 text-white px-3 py-2.5 flex items-center justify-between shadow-lg z-20 sticky top-0">
+        <div className="flex items-center gap-2 min-w-0">
           <button onClick={() => setSidebarOpen(o => !o)}
-            className="p-1.5 rounded-lg bg-white/10 hover:bg-white/20 transition">
+            className="p-2 rounded-lg bg-white/10 hover:bg-white/20 transition flex-shrink-0">
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16"/>
             </svg>
           </button>
-          <span className="font-bold text-sm hidden sm:block leading-tight">
-            {lang === 'he' ? 'קורס מערכות בריאות בעולם – אוניברסיטת תל אביב' : 'Comparative Health Systems – Tel Aviv University'}
-          </span>
+          <div className="min-w-0">
+            <p className="font-bold text-xs sm:text-sm leading-tight truncate">
+              {lang === 'he' ? 'קורס מערכות בריאות בעולם' : 'Comparative Health Systems'}
+            </p>
+            <p className="text-blue-300 text-xs leading-tight hidden sm:block">
+              {lang === 'he' ? 'אוניברסיטת תל אביב' : 'Tel Aviv University'}
+            </p>
+          </div>
         </div>
 
-        <div className="flex items-center gap-2">
-          <div className="hidden sm:flex items-center gap-2 bg-white/10 rounded-full px-3 py-1">
-            <div className="w-20 h-1.5 bg-white/20 rounded-full overflow-hidden">
+        <div className="flex items-center gap-1.5 flex-shrink-0">
+          {/* Progress pill */}
+          <div className="flex items-center gap-1.5 bg-white/10 rounded-full px-2.5 py-1">
+            <div className="w-14 h-1.5 bg-white/20 rounded-full overflow-hidden">
               <div className="h-full bg-emerald-400 rounded-full transition-all" style={{ width: `${pct}%` }}/>
             </div>
             <span className="text-xs font-medium text-blue-100">{pct}%</span>
@@ -210,77 +224,100 @@ export default function QuizPage() {
           <button onClick={() => { setLang('he'); localStorage.setItem('lang','he') }}
             className={`px-2 py-1 rounded text-xs font-bold transition ${lang==='he' ? 'bg-white text-blue-900' : 'bg-white/10 hover:bg-white/20'}`}>עב</button>
           <button onClick={async () => { await supabase.auth.signOut(); router.push('/') }}
-            className="bg-red-500/80 hover:bg-red-500 px-2 py-1 rounded text-xs font-medium transition">
+            className="bg-red-500/80 hover:bg-red-500 px-2 py-1 rounded text-xs font-medium transition hidden sm:block">
             {t('logout', lang)}
           </button>
         </div>
       </header>
 
-      <div className="flex flex-1 overflow-hidden" style={{ height: 'calc(100vh - 56px)' }}>
-        {/* Sidebar */}
+      <div className="flex flex-1 relative overflow-hidden" style={{ height: 'calc(100vh - 52px)' }}>
+        {/* Sidebar backdrop on mobile */}
         {sidebarOpen && (
-          <aside className="w-64 bg-white shadow-xl flex-shrink-0 flex flex-col overflow-y-auto border-e border-gray-200">
-            {/* Country selector */}
-            <div className="p-3 border-b border-gray-100">
-              <button onClick={() => setCountryMenuOpen(o => !o)}
-                className="w-full flex items-center justify-between text-sm font-semibold text-gray-700 hover:text-blue-700 transition py-1">
-                <span>🌍 {lang === 'he' ? 'מדינות' : 'Countries'} ({selectedCountries.length})</span>
-                <svg className={`w-4 h-4 transition-transform ${countryMenuOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7"/>
-                </svg>
-              </button>
-              {countryMenuOpen && (
-                <div className="mt-2 space-y-0.5">
-                  {COUNTRIES.map(c => (
-                    <label key={c.id} className="flex items-center gap-2 px-2 py-1.5 rounded-lg hover:bg-gray-50 cursor-pointer text-sm">
-                      <input type="checkbox" checked={selectedCountries.includes(c.id)}
-                        onChange={() => toggleCountry(c.id)}
-                        className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"/>
-                      <span>{c.flag}</span>
-                      <span className="text-gray-700">{lang === 'he' ? c.he : c.en}</span>
-                    </label>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            {/* Category list */}
-            <div className="flex-1 p-2 overflow-y-auto">
-              <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide px-2 py-2">
-                {lang === 'he' ? 'קטגוריות' : 'Categories'}
-              </p>
-              {CATEGORIES.map((c, i) => {
-                const status = getCatStatus(c.id)
-                return (
-                  <button key={c.id} onClick={() => setCatIndex(i)}
-                    className={`w-full text-start px-3 py-2 rounded-xl mb-0.5 flex items-center gap-2 transition text-sm
-                      ${catIndex === i ? 'bg-blue-600 text-white shadow-sm' : 'hover:bg-gray-100 text-gray-700'}`}>
-                    <span className={`w-2.5 h-2.5 rounded-full flex-shrink-0 ${
-                      status === 'done' ? 'bg-emerald-500' :
-                      status === 'started' ? 'bg-amber-400' :
-                      catIndex === i ? 'bg-blue-300' : 'bg-gray-300'
-                    }`}/>
-                    <span className="truncate leading-snug text-xs">{lang === 'he' ? c.he : c.en}</span>
-                  </button>
-                )
-              })}
-            </div>
-
-            {/* Export + copyright */}
-            <div className="p-3 border-t border-gray-100 space-y-2">
-              <button onClick={() => handleExport('excel')}
-                className="w-full bg-emerald-600 hover:bg-emerald-700 text-white py-2 rounded-xl text-sm font-medium transition">
-                📊 {t('exportExcel', lang)}
-              </button>
-              <p className="text-center text-xs text-gray-400 pt-1">{lang === 'he' ? '© יואל אנג\'ל MD MBA' : '© Yoel Angel MD MBA'}</p>
-            </div>
-          </aside>
+          <div className="fixed inset-0 bg-black/40 z-30 md:hidden" onClick={() => setSidebarOpen(false)}/>
         )}
 
+        {/* Sidebar — fixed drawer on mobile, static on desktop */}
+        <aside className={`
+          fixed md:static top-0 bottom-0 z-40 md:z-auto
+          w-72 md:w-64 bg-white shadow-xl flex-shrink-0 flex flex-col overflow-y-auto border-e border-gray-200
+          transition-transform duration-300
+          ${sidebarOpen ? 'translate-x-0' : (dir === 'rtl' ? 'translate-x-full' : '-translate-x-full')}
+          md:translate-x-0 md:${sidebarOpen ? 'flex' : 'hidden'}
+        `} style={{ top: 0 }}>
+          {/* Mobile close button */}
+          <div className="flex items-center justify-between p-3 border-b border-gray-100 md:hidden">
+            <span className="text-sm font-bold text-blue-900">{lang === 'he' ? 'ניווט' : 'Navigation'}</span>
+            <button onClick={() => setSidebarOpen(false)} className="p-1.5 rounded-lg hover:bg-gray-100">
+              <svg className="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12"/>
+              </svg>
+            </button>
+          </div>
+
+          {/* Country selector */}
+          <div className="p-3 border-b border-gray-100">
+            <button onClick={() => setCountryMenuOpen(o => !o)}
+              className="w-full flex items-center justify-between text-sm font-semibold text-gray-700 hover:text-blue-700 transition py-1">
+              <span>🌍 {lang === 'he' ? 'מדינות' : 'Countries'} ({selectedCountries.length})</span>
+              <svg className={`w-4 h-4 transition-transform ${countryMenuOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7"/>
+              </svg>
+            </button>
+            {countryMenuOpen && (
+              <div className="mt-2 space-y-0.5">
+                {COUNTRIES.map(c => (
+                  <label key={c.id} className="flex items-center gap-2 px-2 py-2 rounded-lg hover:bg-gray-50 cursor-pointer text-sm">
+                    <input type="checkbox" checked={selectedCountries.includes(c.id)}
+                      onChange={() => toggleCountry(c.id)}
+                      className="rounded border-gray-300 text-blue-600 focus:ring-blue-500 w-4 h-4"/>
+                    <span>{c.flag}</span>
+                    <span className="text-gray-700">{lang === 'he' ? c.he : c.en}</span>
+                  </label>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Category list */}
+          <div className="flex-1 p-2 overflow-y-auto">
+            <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide px-2 py-2">
+              {lang === 'he' ? 'קטגוריות' : 'Categories'}
+            </p>
+            {CATEGORIES.map((c, i) => {
+              const status = getCatStatus(c.id)
+              return (
+                <button key={c.id} onClick={() => navToCategory(i)}
+                  className={`w-full text-start px-3 py-2.5 rounded-xl mb-0.5 flex items-center gap-2 transition text-sm
+                    ${catIndex === i ? 'bg-blue-600 text-white shadow-sm' : 'hover:bg-gray-100 text-gray-700'}`}>
+                  <span className={`w-2.5 h-2.5 rounded-full flex-shrink-0 ${
+                    status === 'done' ? 'bg-emerald-500' :
+                    status === 'started' ? 'bg-amber-400' :
+                    catIndex === i ? 'bg-blue-300' : 'bg-gray-300'
+                  }`}/>
+                  <span className="truncate leading-snug text-xs">{lang === 'he' ? c.he : c.en}</span>
+                </button>
+              )
+            })}
+          </div>
+
+          {/* Export + logout + copyright */}
+          <div className="p-3 border-t border-gray-100 space-y-2">
+            <button onClick={handleExport}
+              className="w-full bg-emerald-600 hover:bg-emerald-700 text-white py-2.5 rounded-xl text-sm font-medium transition">
+              📊 {t('exportExcel', lang)}
+            </button>
+            <button onClick={async () => { await supabase.auth.signOut(); router.push('/') }}
+              className="w-full bg-gray-100 hover:bg-gray-200 text-gray-600 py-2 rounded-xl text-sm font-medium transition md:hidden">
+              {t('logout', lang)}
+            </button>
+            <p className="text-center text-xs text-gray-400 pt-1">{lang === 'he' ? '© יואל אנג\'ל MD MBA' : '© Yoel Angel MD MBA'}</p>
+          </div>
+        </aside>
+
         {/* Main content */}
-        <main className="flex-1 overflow-y-auto">
+        <main className="flex-1 overflow-y-auto min-w-0">
           {/* Category header */}
-          <div className="bg-white border-b border-gray-200 px-6 py-4 flex items-center gap-4 sticky top-0 z-10 shadow-sm">
+          <div className="bg-white border-b border-gray-200 px-3 sm:px-6 py-3 flex items-center gap-3 sticky top-0 z-10 shadow-sm">
             <button onClick={() => setCatIndex(i => Math.max(0, i - 1))} disabled={catIndex === 0}
               className="p-2 rounded-xl bg-gray-100 disabled:opacity-30 hover:bg-gray-200 transition flex-shrink-0">
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -289,7 +326,7 @@ export default function QuizPage() {
             </button>
             <div className="text-center flex-1 min-w-0">
               <p className="text-xs text-gray-400 font-medium">{catIndex + 1} / {CATEGORIES.length}</p>
-              <h2 className="text-base sm:text-lg font-bold text-blue-900 leading-tight truncate">
+              <h2 className="text-sm sm:text-base font-bold text-blue-900 leading-tight line-clamp-2">
                 {lang === 'he' ? cat.he : cat.en}
               </h2>
             </div>
@@ -302,7 +339,7 @@ export default function QuizPage() {
           </div>
 
           {/* Country cards */}
-          <div className="p-4 sm:p-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+          <div className="p-3 sm:p-6 grid gap-3 sm:gap-4 sm:grid-cols-2 xl:grid-cols-3">
             {countries.map(country => {
               const k = key(country.id, cat.id)
               const isSaved = savedKeys.has(k)
@@ -313,7 +350,7 @@ export default function QuizPage() {
                     ${isSaved ? 'border-emerald-300' : hasText ? 'border-amber-300' : 'border-transparent hover:border-gray-200'}`}>
                   <div className="flex items-center gap-2">
                     <span className="text-2xl">{country.flag}</span>
-                    <span className="font-bold text-blue-900 flex-1 text-sm sm:text-base">{lang === 'he' ? country.he : country.en}</span>
+                    <span className="font-bold text-blue-900 flex-1 text-sm">{lang === 'he' ? country.he : country.en}</span>
                     {isSaved && <span className="text-emerald-500 text-sm">✓</span>}
                     {hasText && !isSaved && <span className="w-2 h-2 rounded-full bg-amber-400 inline-block"/>}
                   </div>
@@ -322,21 +359,21 @@ export default function QuizPage() {
                     onChange={e => handleChange(country.id, e.target.value)}
                     onBlur={() => handleBlur(country.id)}
                     placeholder={t('yourAnswer', lang)}
-                    rows={5}
+                    rows={4}
                     className="w-full border border-gray-200 rounded-xl p-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent resize-none bg-gray-50 focus:bg-white transition"
                   />
-                  <div className="flex gap-1.5 flex-wrap">
+                  <div className="grid grid-cols-3 gap-1.5">
                     <button onClick={() => showHint(country.id)}
-                      className="flex-1 text-xs py-2 px-2 rounded-xl border border-amber-200 text-amber-700 bg-amber-50 hover:bg-amber-100 font-medium transition">
+                      className="text-xs py-2 px-1 rounded-xl border border-amber-200 text-amber-700 bg-amber-50 hover:bg-amber-100 font-medium transition">
                       💡 {t('hint', lang)}
                     </button>
                     <button onClick={() => showSources(country.id)}
-                      className="flex-1 text-xs py-2 px-2 rounded-xl border border-teal-200 text-teal-700 bg-teal-50 hover:bg-teal-100 font-medium transition">
+                      className="text-xs py-2 px-1 rounded-xl border border-teal-200 text-teal-700 bg-teal-50 hover:bg-teal-100 font-medium transition">
                       🔗 {t('sources', lang)}
                     </button>
                     <button onClick={() => getFeedback(country.id)}
-                      className="w-full text-xs py-2 px-2 rounded-xl border border-violet-200 text-violet-700 bg-violet-50 hover:bg-violet-100 font-medium transition">
-                      🤖 {t('getFeedback', lang)}
+                      className="text-xs py-2 px-1 rounded-xl border border-violet-200 text-violet-700 bg-violet-50 hover:bg-violet-100 font-medium transition">
+                      🤖 AI
                     </button>
                   </div>
                 </div>
@@ -348,19 +385,20 @@ export default function QuizPage() {
 
       {/* Modal */}
       {modal && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4" onClick={() => setModal(null)}>
-          <div dir={dir} className="bg-white rounded-2xl shadow-2xl p-6 max-w-lg w-full" onClick={e => e.stopPropagation()}>
-            <h3 className="font-bold text-blue-900 mb-3 text-lg">
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-end sm:items-center justify-center p-0 sm:p-4" onClick={() => setModal(null)}>
+          <div dir={dir} className="bg-white rounded-t-3xl sm:rounded-2xl shadow-2xl p-5 sm:p-6 w-full sm:max-w-lg max-h-[80vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
+            <div className="w-10 h-1 bg-gray-200 rounded-full mx-auto mb-4 sm:hidden"/>
+            <h3 className="font-bold text-blue-900 mb-3 text-base sm:text-lg">
               {modal.type === 'hint' ? `💡 ${t('hintTitle', lang)}` : modal.type === 'sources' ? `🔗 ${t('sourcesTitle', lang)}` : `🤖 ${t('feedbackTitle', lang)}`}
             </h3>
             {modal.type === 'sources' ? (
-              <div className="space-y-3">
+              <div className="space-y-2.5">
                 {(modal.sources || []).map((s, i) => (
                   <a key={i} href={s.url} target="_blank" rel="noopener noreferrer"
                     className="flex items-center gap-2 p-3 rounded-xl border border-gray-200 hover:border-blue-300 hover:bg-blue-50 transition text-sm text-blue-700 font-medium">
                     <span className="text-lg">📖</span>
-                    <span>{lang === 'he' ? s.labelHe : s.label}</span>
-                    <span className="ms-auto text-gray-400 text-xs">↗</span>
+                    <span className="flex-1">{lang === 'he' ? s.labelHe : s.label}</span>
+                    <span className="text-gray-400 text-xs flex-shrink-0">↗</span>
                   </a>
                 ))}
               </div>
@@ -374,7 +412,7 @@ export default function QuizPage() {
             )}
             {!modal.loading && (
               <button onClick={() => setModal(null)}
-                className="mt-5 w-full bg-gray-100 hover:bg-gray-200 py-2.5 rounded-xl text-sm font-medium transition">
+                className="mt-5 w-full bg-gray-100 hover:bg-gray-200 py-3 rounded-xl text-sm font-medium transition">
                 {t('close', lang)}
               </button>
             )}

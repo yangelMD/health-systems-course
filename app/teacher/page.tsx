@@ -81,20 +81,20 @@ export default function TeacherPage() {
   return (
     <div dir={dir} className="min-h-screen bg-gray-100 flex flex-col">
       {/* Header */}
-      <header className="bg-gradient-to-r from-blue-950 to-blue-800 text-white px-4 py-3 flex items-center justify-between shadow-lg sticky top-0 z-20">
-        <div>
-          <h1 className="font-bold text-sm leading-tight">
+      <header className="bg-gradient-to-r from-blue-950 to-blue-800 text-white px-3 py-2.5 flex items-center justify-between shadow-lg sticky top-0 z-20">
+        <div className="min-w-0">
+          <h1 className="font-bold text-xs sm:text-sm leading-tight truncate">
             {lang === 'he' ? 'ממשק מורים – כוונון משוב AI' : 'Teacher Interface – AI Feedback Tuning'}
           </h1>
-          <p className="text-blue-300 text-xs">
+          <p className="text-blue-300 text-xs hidden sm:block">
             {lang === 'he' ? 'קורס מערכות בריאות בעולם – אוניברסיטת תל אביב' : 'Comparative Health Systems – Tel Aviv University'}
           </p>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1.5 flex-shrink-0">
           <button onClick={() => setShowGuidelines(g => !g)}
-            className="bg-white/10 hover:bg-white/20 px-2 py-1 rounded text-xs font-medium transition">
+            className="bg-white/10 hover:bg-white/20 px-2 py-1.5 rounded text-xs font-medium transition">
             📋 {guidelines.length + hintOverrides.length > 0
-              ? `${guidelines.length + hintOverrides.length} ${lang === 'he' ? 'הגדרות' : 'settings'}`
+              ? `${guidelines.length + hintOverrides.length}`
               : (lang === 'he' ? 'הגדרות' : 'Settings')}
           </button>
           <button onClick={() => { setLang('en'); localStorage.setItem('lang','en') }}
@@ -104,65 +104,77 @@ export default function TeacherPage() {
         </div>
       </header>
 
-      <div className="flex flex-1 overflow-hidden" style={{ height: 'calc(100vh - 56px)' }}>
-        {/* Guidelines panel */}
+      <div className="flex flex-1 overflow-hidden" style={{ height: 'calc(100vh - 52px)' }}>
+        {/* Guidelines panel — side panel on desktop, bottom sheet on mobile */}
         {showGuidelines && (
-          <aside className="w-80 bg-white border-e border-gray-200 flex flex-col overflow-hidden shadow-lg">
-            <div className="p-3 border-b border-gray-100 flex gap-1">
-              <button onClick={() => setPanelTab('guidelines')}
-                className={`flex-1 text-xs font-medium py-1.5 rounded-lg transition ${panelTab === 'guidelines' ? 'bg-blue-600 text-white' : 'text-gray-500 hover:bg-gray-100'}`}>
-                📋 {lang === 'he' ? `הנחיות (${guidelines.length})` : `Guidelines (${guidelines.length})`}
-              </button>
-              <button onClick={() => setPanelTab('hints')}
-                className={`flex-1 text-xs font-medium py-1.5 rounded-lg transition ${panelTab === 'hints' ? 'bg-blue-600 text-white' : 'text-gray-500 hover:bg-gray-100'}`}>
-                💡 {lang === 'he' ? `רמזים (${hintOverrides.length})` : `Hints (${hintOverrides.length})`}
-              </button>
-            </div>
-            <div className="flex-1 overflow-y-auto p-4">
-              {panelTab === 'guidelines' && (
-                <>
-                  <p className="text-xs text-gray-400 mb-3">
-                    {lang === 'he' ? 'נשלחות ל-AI בכל בקשת משוב סטודנט' : 'Sent to AI with every student feedback request'}
-                  </p>
-                  {guidelines.length === 0 ? (
-                    <p className="text-sm text-gray-400 italic">
-                      {lang === 'he' ? 'אין הנחיות עדיין. שוחח עם ה-AI כדי להוסיף.' : 'No guidelines yet. Chat with the AI to add some.'}
+          <>
+            {/* Mobile backdrop */}
+            <div className="fixed inset-0 bg-black/40 z-30 sm:hidden" onClick={() => setShowGuidelines(false)}/>
+            {/* Panel */}
+            <aside className="
+              fixed sm:static bottom-0 left-0 right-0 sm:bottom-auto sm:left-auto sm:right-auto
+              z-40 sm:z-auto
+              sm:w-80 bg-white sm:border-e border-gray-200 flex flex-col sm:overflow-hidden shadow-2xl sm:shadow-lg
+              rounded-t-3xl sm:rounded-none
+              max-h-[70vh] sm:max-h-none sm:h-auto
+            ">
+              <div className="w-10 h-1 bg-gray-200 rounded-full mx-auto mt-3 sm:hidden"/>
+              <div className="p-3 border-b border-gray-100 flex gap-1">
+                <button onClick={() => setPanelTab('guidelines')}
+                  className={`flex-1 text-xs font-medium py-1.5 rounded-lg transition ${panelTab === 'guidelines' ? 'bg-blue-600 text-white' : 'text-gray-500 hover:bg-gray-100'}`}>
+                  📋 {lang === 'he' ? `הנחיות (${guidelines.length})` : `Guidelines (${guidelines.length})`}
+                </button>
+                <button onClick={() => setPanelTab('hints')}
+                  className={`flex-1 text-xs font-medium py-1.5 rounded-lg transition ${panelTab === 'hints' ? 'bg-blue-600 text-white' : 'text-gray-500 hover:bg-gray-100'}`}>
+                  💡 {lang === 'he' ? `רמזים (${hintOverrides.length})` : `Hints (${hintOverrides.length})`}
+                </button>
+              </div>
+              <div className="flex-1 overflow-y-auto p-4">
+                {panelTab === 'guidelines' && (
+                  <>
+                    <p className="text-xs text-gray-400 mb-3">
+                      {lang === 'he' ? 'נשלחות ל-AI בכל בקשת משוב סטודנט' : 'Sent to AI with every student feedback request'}
                     </p>
-                  ) : (
-                    <ol className="space-y-3">
-                      {guidelines.map((g, i) => (
-                        <li key={i} className="flex gap-2 text-sm text-gray-700">
-                          <span className="font-bold text-blue-600 flex-shrink-0">{i + 1}.</span>
-                          <span>{g}</span>
-                        </li>
-                      ))}
-                    </ol>
-                  )}
-                </>
-              )}
-              {panelTab === 'hints' && (
-                <>
-                  <p className="text-xs text-gray-400 mb-3">
-                    {lang === 'he' ? 'רמזים שעודכנו מעל ברירת המחדל' : 'Hints overriding the defaults'}
-                  </p>
-                  {hintOverrides.length === 0 ? (
-                    <p className="text-sm text-gray-400 italic">
-                      {lang === 'he' ? 'אין רמזים מותאמים עדיין.' : 'No hint overrides yet. Ask me to update a hint.'}
+                    {guidelines.length === 0 ? (
+                      <p className="text-sm text-gray-400 italic">
+                        {lang === 'he' ? 'אין הנחיות עדיין. שוחח עם ה-AI כדי להוסיף.' : 'No guidelines yet. Chat with the AI to add some.'}
+                      </p>
+                    ) : (
+                      <ol className="space-y-3">
+                        {guidelines.map((g, i) => (
+                          <li key={i} className="flex gap-2 text-sm text-gray-700">
+                            <span className="font-bold text-blue-600 flex-shrink-0">{i + 1}.</span>
+                            <span>{g}</span>
+                          </li>
+                        ))}
+                      </ol>
+                    )}
+                  </>
+                )}
+                {panelTab === 'hints' && (
+                  <>
+                    <p className="text-xs text-gray-400 mb-3">
+                      {lang === 'he' ? 'רמזים שעודכנו מעל ברירת המחדל' : 'Hints overriding the defaults'}
                     </p>
-                  ) : (
-                    <div className="space-y-4">
-                      {hintOverrides.map((h, i) => (
-                        <div key={i} className="border border-gray-100 rounded-xl p-3 bg-gray-50">
-                          <div className="text-xs font-bold text-blue-700 mb-1">{h.country} — {h.category}</div>
-                          <p className="text-xs text-gray-600 leading-relaxed">{lang === 'he' ? h.he : h.en}</p>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </>
-              )}
-            </div>
-          </aside>
+                    {hintOverrides.length === 0 ? (
+                      <p className="text-sm text-gray-400 italic">
+                        {lang === 'he' ? 'אין רמזים מותאמים עדיין.' : 'No hint overrides yet. Ask me to update a hint.'}
+                      </p>
+                    ) : (
+                      <div className="space-y-4">
+                        {hintOverrides.map((h, i) => (
+                          <div key={i} className="border border-gray-100 rounded-xl p-3 bg-gray-50">
+                            <div className="text-xs font-bold text-blue-700 mb-1">{h.country} — {h.category}</div>
+                            <p className="text-xs text-gray-600 leading-relaxed">{lang === 'he' ? h.he : h.en}</p>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </>
+                )}
+              </div>
+            </aside>
+          </>
         )}
 
         {/* Chat area */}
@@ -222,15 +234,15 @@ export default function TeacherPage() {
           </div>
 
           {/* Input */}
-          <div className="border-t border-gray-200 bg-white p-4">
-            <div className="max-w-3xl mx-auto flex gap-3 items-end">
+          <div className="border-t border-gray-200 bg-white p-3 sm:p-4">
+            <div className="max-w-3xl mx-auto flex gap-2 sm:gap-3 items-end">
               <textarea
                 value={input}
                 onChange={e => setInput(e.target.value)}
                 onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send() } }}
                 placeholder={lang === 'he' ? 'כתוב הנחיה או משוב על איכות התשובות...' : 'Write guidance or feedback about response quality...'}
                 rows={2}
-                className="flex-1 border border-gray-200 rounded-2xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 resize-none bg-gray-50 focus:bg-white transition"
+                className="flex-1 border border-gray-200 rounded-2xl px-3 sm:px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 resize-none bg-gray-50 focus:bg-white transition"
               />
               <button onClick={send} disabled={loading || !input.trim()}
                 className="bg-blue-600 hover:bg-blue-700 disabled:opacity-40 text-white p-2.5 rounded-2xl transition flex-shrink-0">
