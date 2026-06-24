@@ -8,6 +8,7 @@ export const COUNTRIES = [
   { id: 'japan', flag: '🇯🇵', en: 'Japan', he: 'יפן' },
   { id: 'netherlands', flag: '🇳🇱', en: 'Netherlands', he: 'הולנד' },
   { id: 'canada', flag: '🇨🇦', en: 'Canada', he: 'קנדה' },
+  { id: 'turkey', flag: '🇹🇷', en: 'Turkey', he: 'טורקיה' },
 ]
 
 export const CATEGORIES = [
@@ -128,6 +129,10 @@ export const HINTS: Record<number, Record<string, { en: string; he: string }>> =
       en: 'Canada\'s system is called Medicare, established by the Canada Health Act 1984. It is publicly funded but provincially administered across 13 provinces/territories. Each province runs its own plan within federal principles.',
       he: 'המערכת הקנדית נקראת Medicare, הוקמה בחוק הבריאות הקנדי 1984. היא ממומנת ציבורית אך מנוהלת ברמה מחוזית ב-13 פרובינציות/טריטוריות. כל פרובינציה מנהלת את תוכניתה במסגרת עקרונות פדרליים.',
     },
+    turkey: {
+      en: 'Turkey uses a single-payer model called GSS (Genel Sağlık Sigortası), covering ~99% of residents, managed by SGK (Sosyal Güvenlik Kurumu). Membership became mandatory in 2012 as part of the 2003 Health Transformation Program.',
+      he: 'טורקיה משתמשת במודל מבטח יחיד הנקרא GSS (Genel Sağlık Sigortası), המכסה ~99% מהתושבים, ומנוהל על ידי SGK. החברות הפכה לחובה ב-2012 כחלק מתוכנית הטרנספורמציה הבריאותית משנת 2003.',
+    },
   },
   2: {
     israel: {
@@ -165,6 +170,10 @@ export const HINTS: Record<number, Record<string, { en: string; he: string }>> =
     canada: {
       en: 'About 65-70% of Canadians have supplementary private insurance, mostly employer-provided, covering prescription drugs, dental, vision, and other services excluded from provincial Medicare plans.',
       he: 'כ-65-70% מהקנדים מחזיקים בביטוח פרטי משלים, בעיקר מסופק על ידי המעסיק, המכסה תרופות מרשם, שיניים, ראייה ושירותים אחרים שאינם נכללים בתוכניות Medicare המחוזיות.',
+    },
+    turkey: {
+      en: 'About 12.5% of the population holds private supplementary insurance covering co-payments or non-basket services. The 2011 PPP legislation opened new channels for private sector participation alongside the public system.',
+      he: 'כ-12.5% מהאוכלוסייה מחזיקים בביטוח פרטי משלים המכסה תשלומים עצמיים או שירותים שאינם בסל. חקיקת ה-PPP משנת 2011 פתחה ערוצים חדשים לשתוף פעולה עם המגזר הפרטי.',
     },
   },
   3: {
@@ -204,6 +213,10 @@ export const HINTS: Record<number, Record<string, { en: string; he: string }>> =
       en: 'Long-term care in Canada is provincially administered and a mix of public and private funding. The COVID-19 pandemic exposed severe underfunding and staffing shortages in nursing homes, triggering national reform discussions.',
       he: 'טיפול ארוך טווח בקנדה מנוהל ברמה מחוזית ומשלב מימון ציבורי ופרטי. מגפת COVID-19 חשפה מחסור חמור במימון ובכוח אדם בבתי אבות, מה שעורר דיונים ברפורמה לאומית.',
     },
+    turkey: {
+      en: 'Turkey has no dedicated mandatory long-term care insurance law. Rehabilitation and assistive equipment are included in the GSS basket. LTC is largely family-based, with limited formal nursing home infrastructure.',
+      he: 'לטורקיה אין חוק ביטוח סיעודי ייעודי. שיקום וציוד עזר כלולים בסל GSS. הטיפול הסיעודי הוא ברובו משפחתי, עם תשתית מוסדית מוגבלת.',
+    },
   },
   4: {
     israel: {
@@ -241,6 +254,10 @@ export const HINTS: Record<number, Record<string, { en: string; he: string }>> =
     canada: {
       en: 'Funded through general federal and provincial taxes. No user fees for medically necessary services (Canada Health Act prohibits them). However, significant OOP exists for excluded services (drugs, dental). Federal transfers to provinces are a constant political tension.',
       he: 'ממומן דרך מיסים פדרליים ומחוזיים כלליים. אין תשלומי משתמש לשירותים הכרחיים מבחינה רפואית (חוק הבריאות הקנדי אוסר עליהם). עם זאת, קיימת הוצאה מהכיס משמעותית לשירותים שאינם מכוסים (תרופות, שיניים). העברות פדרליות לפרובינציות מהוות מתח פוליטי מתמיד.',
+    },
+    turkey: {
+      en: 'Turkey\'s system has multiple funding streams: general taxes (~36%), payroll contributions of 12.5% shared between employer and employee (~39.5%), out-of-pocket payments (~18.8%), private insurance (~2.8%), and associations (~2.4%).',
+      he: 'מימון המערכת הטורקית מגיע ממקורות מגוונים: מיסים כלליים (~36%), דמי ביטוח של 12.5% מחולקים בין מעסיק לעובד (~39.5%), תשלום מהכיס (~18.8%), ביטוחים פרטיים (~2.8%) ועמותות (~2.4%).',
     },
   },
   5: {
@@ -280,6 +297,10 @@ export const HINTS: Record<number, Record<string, { en: string; he: string }>> =
       en: 'Family physicians and specialists are mostly private self-employed practitioners billing provincial insurance plans (fee for service). Hospitals are predominantly private non-profit, publicly funded. True private-for-profit hospitals are rare for insured services.',
       he: 'רופאי משפחה ומומחים הם בעיקר מטפלים עצמאיים פרטיים המחייבים תוכניות ביטוח מחוזיות (תשלום עבור שירות). בתי חולים הם בעיקר ללא מטרות רווח פרטיים, ממומנים ציבורית. בתי חולים פרטיים למטרות רווח נדירים לשירותים המכוסים.',
     },
+    turkey: {
+      en: 'Turkey has three types of hospitals: MoH-owned public hospitals, private hospitals, and university hospitals. Primary care is delivered through family medicine centers (ASM). The MoH acts as both regulator and major provider.',
+      he: 'בטורקיה שלושה סוגי בתי חולים: בתי חולים ציבוריים של משרד הבריאות, בתי חולים פרטיים ובתי חולים אוניברסיטאיים. הרפואה הראשונית ניתנת דרך מרכזי רפואת משפחה (ASM). משרד הבריאות משמש גם כרגולטור וגם כספק עיקרי.',
+    },
   },
   6: {
     israel: {
@@ -317,6 +338,10 @@ export const HINTS: Record<number, Record<string, { en: string; he: string }>> =
     canada: {
       en: 'Family physicians are the main primary care providers, often acting as gatekeepers to specialist care. However, there are significant shortages — about 6 million Canadians lack a family doctor. Nurse practitioners and community health centers help fill gaps.',
       he: 'רופאי משפחה הם ספקי הטיפול הראשוני העיקריים, הפועלים לרוב כשוערים לטיפול מומחה. עם זאת, ישנם מחסורים משמעותיים — כ-6 מיליון קנדים חסרי רופא משפחה. אחיות מומחיות ומרכזי בריאות קהילתיים עוזרים למלא את הפערים.',
+    },
+    turkey: {
+      en: 'Turkey\'s family medicine system (aile hekimliği) was piloted in 2005 and expanded nationwide by 2011. Family doctors work in ASM centers, paid by capitation + performance bonuses. Gatekeeping was tried but abolished due to overload on the community.',
+      he: 'מערכת רפואת המשפחה הטורקית (aile hekimliği) הופעלה בניסוי ב-2005 והורחבה ארצית ב-2011. רופאי משפחה עובדים במרכזי ASM, משולמים בקפיטציה ובתוספת בונוסי ביצועים. שמירת שער נוסתה אך בוטלה עקב עומס על הקהילה.',
     },
   },
   7: {
@@ -356,6 +381,10 @@ export const HINTS: Record<number, Record<string, { en: string; he: string }>> =
       en: 'Specialists work mostly in hospitals or specialized outpatient clinics. GP referral is required in most provinces. Wait times for specialist appointments and elective procedures are among the longest in the OECD, a major ongoing policy concern.',
       he: 'מומחים עובדים בעיקר בבתי חולים או במרפאות מומחים חוץ-בית-חולי. הפניה מ-GP נדרשת ברוב הפרובינציות. זמני המתנה לפגישות מומחה ולהליכים אלקטיביים הם מהארוכים ב-OECD, דאגת מדיניות מרכזית ומתמשכת.',
     },
+    turkey: {
+      en: 'No referral is needed for specialist care in Turkey (gatekeeping was abolished). A co-payment system exists to reduce overuse of secondary care, but overcrowding in specialist clinics and hospitals remains a challenge.',
+      he: 'אין צורך בהפניה לטיפול מומחה בטורקיה (שמירת שער בוטלה). קיים מנגנון תשלום עצמי לצמצום ניצולת יתר, אך צפיפות יתר במרפאות מומחים ובבתי חולים נותרת אתגר.',
+    },
   },
   8: {
     israel: {
@@ -393,6 +422,10 @@ export const HINTS: Record<number, Record<string, { en: string; he: string }>> =
     canada: {
       en: 'Academic Health Sciences Centers (AHSCs), affiliated with medical schools, provide tertiary and quaternary care. They also train physicians and conduct research. Inter-provincial referrals occur for rare conditions where only one or two centers in the country exist.',
       he: 'מרכזי מדעי הבריאות האקדמיים (AHSCs), המסונפים לאסכולות רפואיות, מספקים טיפול שלישוני ורביעוני. הם גם מכשירים רופאים ומנהלים מחקר. הפניות בין-פרובינציאליות מתרחשות למצבים נדירים שבהם קיים רק מרכז אחד או שניים בכל המדינה.',
+    },
+    turkey: {
+      en: 'University hospitals serve as the main tertiary referral centers. Since 2011, major hospital infrastructure expansion used PPP models (BOT/BLT) — private companies build and operate hospitals, transferring them to the state after a set period.',
+      he: 'בתי חולים אוניברסיטאיים משמשים כמרכזי הפניה שלישוניים עיקריים. מאז 2011, הרחבת תשתית בתי חולים ניצלה מודלי PPP (BOT/BLT) — חברות פרטיות בונות ומפעילות בתי חולים ומעבירות אותם למדינה לאחר תקופה קבועה.',
     },
   },
   9: {
@@ -432,6 +465,10 @@ export const HINTS: Record<number, Record<string, { en: string; he: string }>> =
       en: 'Medically necessary hospital and physician services are universally covered in all provinces per the Canada Health Act. Specific services vary by province but generally include inpatient care, surgery, diagnostic tests, and physician visits.',
       he: 'שירותי בית חולים ורופאים הכרחיים מבחינה רפואית מכוסים אוניברסלית בכל הפרובינציות לפי חוק הבריאות הקנדי. שירותים ספציפיים משתנים לפי פרובינציה אך בדרך כלל כוללים טיפול אשפוז, ניתוח, בדיקות אבחון וביקורי רופא.',
     },
+    turkey: {
+      en: 'The GSS basket is set by the Ministry of Health and includes inpatient care, primary and specialist care (with partial co-payment), preventive medicine, maternity and fertility, medications, dental (orthodontics under 18), rehabilitation, assistive devices, and optometry.',
+      he: 'סל GSS נקבע על ידי משרד הבריאות וכולל טיפול אשפוז, רפואה ראשונית ומומחים (עם תשלום עצמי חלקי), רפואה מונעת, מיילדות ופריון, תרופות, שיניים (אורתודנטיה מתחת ל-18), שיקום, ציוד עזר ואופטומטריה.',
+    },
   },
   10: {
     israel: {
@@ -469,6 +506,10 @@ export const HINTS: Record<number, Record<string, { en: string; he: string }>> =
     canada: {
       en: 'Prescription drugs (no national pharmacare until recently), dental, vision, ambulance, home care (variable by province), physiotherapy, psychology, and most long-term care costs are not covered under provincial Medicare plans.',
       he: 'תרופות מרשם (ללא Pharmacare לאומי עד לאחרונה), שיניים, ראייה, אמבולנס, טיפול בבית (משתנה לפי פרובינציה), פיזיותרפיה, פסיכולוגיה ורוב עלויות הטיפול ארוך הטווח אינם מכוסים תחת תוכניות Medicare המחוזיות.',
+    },
+    turkey: {
+      en: 'Adult dental care beyond basic, cosmetic procedures, services exceeding basket limits, and most private amenities are not covered. Co-payments apply to specialist visits, reducing but not eliminating out-of-pocket costs.',
+      he: 'טיפול שיניים למבוגרים מעבר לבסיסי, פרוצדורות קוסמטיות, שירותים חורגים מגבולות הסל ורוב השירותים הפרטיים אינם מכוסים. תשלום עצמי חל על ביקורי מומחים, מה שמפחית אך לא מבטל עלויות מהכיס.',
     },
   },
   11: {
@@ -508,6 +549,10 @@ export const HINTS: Record<number, Record<string, { en: string; he: string }>> =
       en: 'The Canada Health Act technically allows private delivery of insured services but prohibits extra-billing. In practice, most insured services are publicly funded. However, a growing private sector operates for non-insured services (dental, physiotherapy, drugs), and a small parallel private market exists in some provinces.',
       he: 'חוק הבריאות הקנדי מאפשר מבחינה טכנית מתן פרטי של שירותים מבוטחים אך אוסר חיוב נוסף. בפועל, רוב השירותים המבוטחים ממומנים ציבורית. עם זאת, מגזר פרטי גדל פועל לשירותים שאינם מבוטחים (שיניים, פיזיותרפיה, תרופות), ושוק פרטי מקביל קטן קיים בחלק מהפרובינציות.',
     },
+    turkey: {
+      en: 'Private healthcare is mainly in large cities. About 12.5% hold private insurance. PPP hospitals offer better facilities and shorter waiting times. Medical tourism is a growing industry, with Turkey ranking among top global destinations for health tourism.',
+      he: 'הרפואה הפרטית היא בעיקר בערים הגדולות. כ-12.5% מחזיקים בביטוח פרטי. בתי חולים PPP מציעים מתקנים טובים יותר וזמני המתנה קצרים יותר. תיירות מרפא היא ענף גדל, עם טורקיה המדורגת בין היעדים הגלובליים המובילים.',
+    },
   },
   12: {
     israel: {
@@ -545,6 +590,10 @@ export const HINTS: Record<number, Record<string, { en: string; he: string }>> =
     canada: {
       en: 'LTC is provincially administered with significant variation. It includes home care (variable), community support, and residential facilities (nursing homes/long-term care homes). Public funding covers part of the cost; residents pay means-tested co-payments. COVID-19 exposed catastrophic failures in many facilities.',
       he: 'טיפול ארוך טווח מנוהל ברמה מחוזית עם שונות משמעותית. הוא כולל טיפול בבית (משתנה), תמיכה קהילתית ומתקני מגורים (בתי אבות/מוסדות סיעוד). המימון הציבורי מכסה חלק מהעלות; התושבים משלמים תשלומים עצמיים על בסיס אמצעים. COVID-19 חשף כישלונות קטסטרופליים במתקנים רבים.',
+    },
+    turkey: {
+      en: 'There is no dedicated LTC insurance law in Turkey. Rehabilitation services are in the GSS basket. LTC is predominantly family-based. Limited nursing home infrastructure exists, operated by the Ministry of Family and Social Services.',
+      he: 'אין חוק ביטוח סיעודי ייעודי בטורקיה. שירותי שיקום נמצאים בסל GSS. הטיפול הסיעודי הוא בעיקרו משפחתי. קיימת תשתית בתי אבות מוגבלת, המופעלת על ידי משרד המשפחה והשירותים החברתיים.',
     },
   },
   13: {
@@ -584,6 +633,10 @@ export const HINTS: Record<number, Record<string, { en: string; he: string }>> =
       en: 'Hospital beds: ~2.5/1,000 (below OECD average). Physicians: ~2.8/1,000. Nurses: ~10.4/1,000. MRI: ~11/million. Canada has relatively fewer physicians and longer wait times partly due to supply constraints.',
       he: 'מיטות בית חולים: ~2.5/1,000 (מתחת לממוצע OECD). רופאים: ~2.8/1,000. אחיות: ~10.4/1,000. MRI: ~11/מיליון. לקנדה יש פחות רופאים יחסית וזמני המתנה ארוכים יותר, בחלקם בגלל אילוצי היצע.',
     },
+    turkey: {
+      en: 'Turkey has among the lowest physician (~1.9/1,000) and nurse (~2.3/1,000) ratios in the OECD. National programs aim to increase medical workforce. Hospital beds: ~2.9/1,000 (growing through PPP construction). Significant shortages persist in rural areas.',
+      he: 'לטורקיה אחד מהיחסים הנמוכים ביותר של רופאים (~1.9/1,000) ואחיות (~2.3/1,000) ב-OECD. תוכניות לאומיות שואפות להגדיל את כוח האדם הרפואי. מיטות בית חולים: ~2.9/1,000 (גדל דרך בנייה בשיטת PPP). מחסורים משמעותיים ממשיכים באזורים כפריים.',
+    },
   },
   14: {
     israel: {
@@ -622,6 +675,10 @@ export const HINTS: Record<number, Record<string, { en: string; he: string }>> =
       en: 'Health expenditure: ~12.2% GDP, ~$7,000 per capita. Life expectancy: ~82.4 years. Infant mortality: ~4.5/1,000. Canada spends significantly more than the UK for comparable outcomes, mainly driven by high physician and drug costs.',
       he: 'הוצאה לבריאות: ~12.2% תמ"ג, ~$7,000 לנפש. תוחלת חיים: ~82.4 שנים. תמותת תינוקות: ~4.5/1,000. קנדה מוציאה הרבה יותר מבריטניה לתוצאות דומות, בעיקר בשל עלויות גבוהות של רופאים ותרופות.',
     },
+    turkey: {
+      en: 'Health expenditure: ~4.6% GDP, ~$1,500 per capita (well below OECD average). Life expectancy: ~78.6 years. Infant mortality improved dramatically (from ~60/1,000 in 1990 to ~8/1,000 today). Significant urban-rural gaps in outcomes persist.',
+      he: 'הוצאה לבריאות: ~4.6% תמ"ג, ~$1,500 לנפש (נמוך משמעותית מממוצע OECD). תוחלת חיים: ~78.6 שנים. תמותת תינוקות השתפרה דרמטית (מ-~60/1,000 ב-1990 ל-~8/1,000 היום). פערים משמעותיים עירוניים-כפריים בתוצאות ממשיכים.',
+    },
   },
   15: {
     israel: {
@@ -659,6 +716,10 @@ export const HINTS: Record<number, Record<string, { en: string; he: string }>> =
     canada: {
       en: 'Canada\'s "Medicare" is a federal-provincial partnership — publicly funded but provincially administered, creating 13 distinct systems under one national framework. The Canada Health Act prohibits extra-billing, maintaining equity. The absence of national pharmacare (until recently) and long wait times are defining weaknesses alongside strong primary care equity.',
       he: 'ה-"Medicare" הקנדי הוא שותפות פדרלית-מחוזית — ממומן ציבורית אך מנוהל מחוזית, ויוצר 13 מערכות נפרדות תחת מסגרת לאומית אחת. חוק הבריאות הקנדי אוסר חיוב נוסף, ושומר על שוויון. היעדר Pharmacare לאומי (עד לאחרונה) וזמני המתנה ארוכים הם חולשות מגדירות לצד שוויון חזק בטיפול הראשוני.',
+    },
+    turkey: {
+      en: 'Turkey\'s defining feature is the 2003 Health Transformation Program (HTP) — a comprehensive single-decade reform creating universal coverage, a family medicine network, and PPP hospital construction. Coverage of ~3 million Syrian refugees at no cost is unique globally.',
+      he: 'המאפיין הייחודי של טורקיה הוא תוכנית הטרנספורמציה הבריאותית (HTP) 2003 — רפורמה מקיפה ביעד עשר שנים שיצרה כיסוי אוניברסלי, רשת רפואת משפחה ובנייה בשיטת PPP. כיסוי של ~3 מיליון פליטים סורים ללא עלות הוא ייחודי עולמית.',
     },
   },
 }
@@ -706,5 +767,9 @@ export const COUNTRY_SOURCES: Record<string, Source[]> = {
   canada: [
     { label: 'OECD Health at a Glance 2025', labelHe: 'OECD Health at a Glance 2025', url: 'https://www.oecd.org/en/publications/2025/11/health-at-a-glance-2025_a894f72e.html' },
     { label: 'Canadian Institute for Health Information', labelHe: 'המכון הקנדי למידע בריאות', url: 'https://www.cihi.ca/en/health-system-overview' },
+  ],
+  turkey: [
+    { label: 'Euro Health Observatory – Türkiye', labelHe: 'Euro Health Observatory – טורקיה', url: 'https://eurohealthobservatory.who.int/countries/turkiye' },
+    { label: 'OECD Health at a Glance 2025', labelHe: 'OECD Health at a Glance 2025', url: 'https://www.oecd.org/en/publications/2025/11/health-at-a-glance-2025_a894f72e.html' },
   ],
 }
