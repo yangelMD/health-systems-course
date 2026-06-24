@@ -1,7 +1,7 @@
 'use client'
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { supabase } from '@/lib/supabase'
+import { supabase, authFetch } from '@/lib/supabase'
 import { COUNTRIES, CATEGORIES } from '@/data/content'
 import { t } from '@/lib/i18n'
 import type { Lang } from '@/lib/types'
@@ -23,7 +23,7 @@ export default function SelectPage() {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) { router.push('/'); return }
       setUserId(user.id)
-      const res = await fetch(`/api/countries?userId=${user.id}`)
+      const res = await authFetch(`/api/countries?userId=${user.id}`)
       const countries = await res.json()
       if (countries?.length) setSelected(countries)
       setLoading(false)
@@ -37,7 +37,7 @@ export default function SelectPage() {
 
   async function handleStart() {
     if (selected.length === 0) { setError(t('selectAtLeast', lang)); return }
-    await fetch('/api/countries', {
+    await authFetch('/api/countries', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ userId, countries: selected }),

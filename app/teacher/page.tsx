@@ -1,5 +1,6 @@
 'use client'
 import { useEffect, useRef, useState } from 'react'
+import { authFetch } from '@/lib/supabase'
 import type { Lang } from '@/lib/types'
 
 interface Message { role: 'user' | 'assistant'; content: string }
@@ -51,7 +52,7 @@ export default function TeacherPage() {
     setMessages(m => [...m, { role: 'user', content: text }])
     setLoading(true)
     try {
-      const res = await fetch('/api/teacher/chat', {
+      const res = await authFetch('/api/teacher/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ message: text }),
@@ -66,7 +67,7 @@ export default function TeacherPage() {
 
   async function clearHistory() {
     if (!confirm(lang === 'he' ? 'למחוק את כל השיחה?' : 'Clear entire conversation?')) return
-    await fetch('/api/teacher/chat', { method: 'DELETE' })
+    await authFetch('/api/teacher/chat', { method: 'DELETE' })
     setMessages([])
   }
 

@@ -1,7 +1,7 @@
 'use client'
 import { useEffect, useState, useCallback, useRef } from 'react'
 import { useRouter } from 'next/navigation'
-import { supabase } from '@/lib/supabase'
+import { supabase, authFetch } from '@/lib/supabase'
 import { COUNTRIES, CATEGORIES, COUNTRY_SOURCES } from '@/data/content'
 import { t } from '@/lib/i18n'
 import type { Lang } from '@/lib/types'
@@ -36,9 +36,9 @@ export default function QuizPage() {
       setUserId(user.id)
 
       const [countriesRes, answersRes, hintsRes] = await Promise.all([
-        fetch(`/api/countries?userId=${user.id}`),
-        fetch(`/api/answers?userId=${user.id}`),
-        fetch('/api/hints'),
+        authFetch(`/api/countries?userId=${user.id}`),
+        authFetch(`/api/answers?userId=${user.id}`),
+        authFetch('/api/hints'),
       ])
       const countries = await countriesRes.json()
       const ans = await answersRes.json()
@@ -66,7 +66,7 @@ export default function QuizPage() {
 
   const saveAnswer = useCallback(async (country: string, catId: number, text: string, uid: string) => {
     const k = key(country, catId)
-    await fetch('/api/answers', {
+    await authFetch('/api/answers', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ userId: uid, country, categoryId: catId, answerText: text }),
@@ -100,7 +100,7 @@ export default function QuizPage() {
       ? selectedCountries.filter(c => c !== countryId)
       : [...selectedCountries, countryId]
     setSelectedCountries(newList)
-    await fetch('/api/countries', {
+    await authFetch('/api/countries', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ userId, countries: newList }),
@@ -130,7 +130,7 @@ export default function QuizPage() {
     const countryName = lang === 'he' ? country?.he : country?.en
     const catName = lang === 'he' ? cat.he : cat.en
     try {
-      const res = await fetch('/api/feedback', {
+      const res = await authFetch('/api/feedback', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ answer: answerText, country: countryName, category: catName, categoryId: cat.id, countryId, lang }),
@@ -170,7 +170,7 @@ export default function QuizPage() {
   const dir = lang === 'he' ? 'rtl' : 'ltr'
 
   async function handleExport() {
-    const res = await fetch('/api/export', {
+    const res = await authFetch('/api/export', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ userId, selectedCountries, lang }),

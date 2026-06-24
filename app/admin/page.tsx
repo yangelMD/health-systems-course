@@ -1,7 +1,7 @@
 'use client'
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { supabase } from '@/lib/supabase'
+import { supabase, authFetch } from '@/lib/supabase'
 import { CATEGORIES, COUNTRIES } from '@/data/content'
 import { t } from '@/lib/i18n'
 import type { Lang } from '@/lib/types'
@@ -48,7 +48,7 @@ export default function AdminPage() {
   }
 
   async function loadStudents() {
-    const res = await fetch('/api/admin/students')
+    const res = await authFetch('/api/admin/students')
     const data = await res.json()
     setRows(data.map((r: any) => ({
       profile: r.profile,
@@ -60,13 +60,13 @@ export default function AdminPage() {
   }
 
   async function loadPrompt() {
-    const res = await fetch('/api/admin/prompt')
+    const res = await authFetch('/api/admin/prompt')
     const data = await res.json()
     setAiPrompt(data.prompt)
   }
 
   async function savePrompt() {
-    await fetch('/api/admin/prompt', {
+    await authFetch('/api/admin/prompt', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ prompt: aiPrompt }),
@@ -77,7 +77,7 @@ export default function AdminPage() {
 
   async function deleteUser(id: string) {
     if (!confirm(t('confirmDelete', lang))) return
-    await fetch('/api/admin/students', {
+    await authFetch('/api/admin/students', {
       method: 'DELETE',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ id }),
@@ -88,7 +88,7 @@ export default function AdminPage() {
   async function resetPassword(id: string, username: string) {
     const newPassword = prompt(lang === 'he' ? `סיסמה חדשה עבור ${username}:` : `New password for ${username}:`)
     if (!newPassword) return
-    const res = await fetch('/api/admin/reset-password', {
+    const res = await authFetch('/api/admin/reset-password', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ userId: id, newPassword }),
@@ -100,7 +100,7 @@ export default function AdminPage() {
 
   async function toggleTeacherRole(id: string, currentRole: string) {
     const newRole = currentRole === 'teacher' ? 'student' : 'teacher'
-    await fetch('/api/admin/students', {
+    await authFetch('/api/admin/students', {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ id, role: newRole }),
@@ -109,7 +109,7 @@ export default function AdminPage() {
   }
 
   async function viewStudent(row: StudentRow) {
-    const res = await fetch(`/api/answers?userId=${row.profile.id}`)
+    const res = await authFetch(`/api/answers?userId=${row.profile.id}`)
     const answers = await res.json()
     setDetail({ username: row.profile.username, answers, selectedCountries: row.selectedCountries })
     setDetailCatIndex(0)

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
+import { getRequestUser } from '@/lib/serverAuth'
 import { COUNTRIES, CATEGORIES } from '@/data/content'
 import * as XLSX from 'xlsx'
 
@@ -9,7 +10,11 @@ const supabase = createClient(
 )
 
 export async function POST(req: NextRequest) {
+  const user = await getRequestUser(req)
+  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+
   const { userId, selectedCountries, lang, format } = await req.json()
+  if (userId !== user.id) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
 
   const { data: answers } = await supabase
     .from('answers')

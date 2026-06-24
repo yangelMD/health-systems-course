@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
+import { requireAdmin } from '@/lib/serverAuth'
 
 const admin = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -7,7 +8,8 @@ const admin = createClient(
   { auth: { autoRefreshToken: false, persistSession: false } }
 )
 
-export async function GET() {
+export async function GET(req: NextRequest) {
+  if (!await requireAdmin(req)) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   const { data: profiles } = await admin.from('profiles').select('*').eq('role', 'student')
   if (!profiles) return NextResponse.json([])
 
@@ -27,6 +29,7 @@ export async function GET() {
 }
 
 export async function DELETE(req: NextRequest) {
+  if (!await requireAdmin(req)) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   const { id } = await req.json()
   await admin.from('profiles').delete().eq('id', id)
   await admin.auth.admin.deleteUser(id)
@@ -34,6 +37,7 @@ export async function DELETE(req: NextRequest) {
 }
 
 export async function PATCH(req: NextRequest) {
+  if (!await requireAdmin(req)) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   const { id, role } = await req.json()
   await admin.from('profiles').update({ role }).eq('id', id)
   return NextResponse.json({ ok: true })

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import Anthropic from '@anthropic-ai/sdk'
 import { createClient } from '@supabase/supabase-js'
+import { getRequestUser } from '@/lib/serverAuth'
 import { DEFAULT_PROMPT } from '@/lib/defaultPrompt'
 import { ANSWERS } from '@/data/answers'
 
@@ -12,6 +13,8 @@ const admin = createClient(
 )
 
 export async function POST(req: NextRequest) {
+  if (!await getRequestUser(req)) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+
   const { answer, country, category, categoryId, countryId, lang } = await req.json()
 
   const [{ data: setting }, { data: guidelinesSetting }] = await Promise.all([
@@ -28,7 +31,10 @@ export async function POST(req: NextRequest) {
 
 Country: ${country}
 Category: ${category}
-Language: ${lang === 'he' ? 'Hebrew' : 'English'}${guidelines.length ? `\n\nInstructor guidelines for feedback (follow these carefully):\n${guidelines.map((g, i) => `${i + 1}. ${g}`).join('\n')}` : ''}${modelText ? `\n\nModel answer for reference (do not reveal this verbatim to the student):\n${modelText}` : ''}`
+Language: ${lang === 'he' ? 'Hebrew' : 'English'}${guidelines.length ? `\n\nInstructor guidelines (follow these carefully):\n${guidelines.map((g, i) => `${i + 1}. ${g}`).join('\n')}` : ''}
+
+Reference answer (authoritative source — base your feedback on this, do not add facts not present here):
+${modelText ?? '(No reference answer available for this combination — use the student answer alone.)'}`
 
   try {
     const msg = await client.messages.create({

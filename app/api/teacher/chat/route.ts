@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import Anthropic from '@anthropic-ai/sdk'
 import { createClient } from '@supabase/supabase-js'
+import { getRequestUser } from '@/lib/serverAuth'
 
 const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
 const admin = createClient(
@@ -47,6 +48,7 @@ export async function GET() {
 }
 
 export async function POST(req: NextRequest) {
+  if (!await getRequestUser(req)) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   const { message } = await req.json()
 
   // Save user message
@@ -134,7 +136,8 @@ ${currentGuidelines.length ? currentGuidelines.map((g, i) => `${i + 1}. ${g}`).j
   return NextResponse.json({ reply: displayText })
 }
 
-export async function DELETE() {
+export async function DELETE(req: NextRequest) {
+  if (!await getRequestUser(req)) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   await admin.from('teacher_messages').delete().neq('id', '00000000-0000-0000-0000-000000000000')
   return NextResponse.json({ ok: true })
 }
